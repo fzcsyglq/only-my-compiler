@@ -1,0 +1,10 @@
+g++ main.cpp visitor.cpp SysYLexer.cpp SysYParser.cpp ../ir/ir.cpp ../backend/asm.cpp -o compiler -lantlr4-runtime
+./compiler -S -o testcase.s testcase.sy
+scp main 192.168.1.104:/home/fzcsyglq/Desktop/work
+misakamikoto
+ssh fzcsyglq@192.168.1.104
+misakamikoto
+cd /home/fzcsyglq/Desktop/work
+./main
+echo $?
+exit

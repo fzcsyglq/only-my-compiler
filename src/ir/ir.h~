@@ -1,0 +1,91 @@
+#pragma once
+
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+#include <map>
+
+using std::string;
+using std::vector;
+using std::map;
+
+namespace IR {
+    
+    enum {Alloca, Store, Load, Br, Call, Const};
+    enum {Int, Float, Void};
+
+    class code {};
+    
+    class part : public code {};
+
+    class data {
+        
+    public:
+        
+        data(){}
+        data(int id, int type, bool is_global):
+            id(id), type(type), is_global(is_global){}
+        int id, type, value;
+        bool is_global;
+        vector<int> arr;
+    };
+    
+    class function : public code{
+        data ret;
+        string name;
+        vector<data> para;
+        vector<part> content;
+    };
+    
+    class command : public part {
+        
+    public:
+        
+        data result, left, right;
+        int type;
+        bool is_const;
+        
+        command(){is_const = false;}
+        command(int type, data result, data left, data right, bool is_const = false):
+            type(type), result(result), left(left), right(right) {
+            this->is_const = is_const;
+        }
+
+        void add(bool _is_const) {
+            is_const = _is_const;
+        }
+    };
+    
+    class block : public part {
+        int id;
+        vector<command> content;
+        map<string, int> ma;
+    };
+    
+    class CompUnit {
+    public:
+
+        
+        vector<code> content;
+        vector<code> &now;
+        int cnt;
+        int now_type, is_const, is_global;
+        int lst, pre_type, lst_type;
+        map<string, int> ma;
+
+        CompUnit(vector<code> &now):
+            now(now) {cnt = 0;}
+        
+        void add_ConstDef(string id);
+
+        void add_AddExp(data left, data right);
+        
+        void add_MulExp(data left, data right);
+
+        void add_Int(int value);
+
+        void add_Float(float value);
+    };
+};

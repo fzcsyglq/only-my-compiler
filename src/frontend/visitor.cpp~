@@ -1,0 +1,262 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+
+#include "visitor.h"
+#include "../ir/ir.h"
+
+using namespace std;
+
+Visitor::Visitor(IR::CompUnit &_ir) : ir(_ir){}
+
+antlrcpp::Any Visitor::visitCompUnit(SysYParser::CompUnitContext *ctx) {
+    cout<<"CompUnit"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitDecl(SysYParser::DeclContext *ctx) {
+    cout<<"Decl"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitConstDecl(SysYParser::ConstDeclContext *ctx) {
+    cout<<"ConstDecl"<<endl;
+    ir.is_const = true;
+    visitChildren(ctx);
+    ir.is_const = false;
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitBType(SysYParser::BTypeContext *ctx) {
+    cout<<"BType"<<endl;
+    if (ctx->getText() == "void") ir.now_type = Void;
+    else if (ctx->getText() == "int") ir.now_type = Int;
+    else ir.now_type = Float;
+    
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
+    cout<<"ConstDef"<<endl;
+    
+    cout<<" "<<ctx->children[0]->getText()<<endl;
+    string name = ctx->children[0]->getText();
+    ctx->children[2]->accept(this);
+    ir.add_ConstDef(name);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitConstInitVal(SysYParser::ConstInitValContext *ctx) {
+    cout<<"ConstInitVal"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitVarDecl(SysYParser::VarDeclContext *ctx) {
+    cout<<"VarDecl"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
+    cout<<"VarDef"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitInitVal(SysYParser::InitValContext *ctx) {
+    cout<<"InitVal"<<endl;
+    visitChildren(ctx);
+    return nullptr;    
+}
+
+antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
+    cout<<"FuncDef"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
+    cout<<"FuncType"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
+    cout<<"FuncFParams"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitFuncFParam(SysYParser::FuncFParamContext *ctx) {
+    cout<<"FuncFParam"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitBlock(SysYParser::BlockContext *ctx) {
+    cout<<"Block"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitBlockItem(SysYParser::BlockItemContext *ctx) {
+    cout<<"BLockItem"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitStmt(SysYParser::StmtContext *ctx) {
+    cout<<"Stmt"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitExp(SysYParser::ExpContext *ctx) {
+    cout<<"Exp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitCond(SysYParser::CondContext *ctx) {
+    cout<<"Cond"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
+    cout<<"LVal"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitPrimaryExp(SysYParser::PrimaryExpContext *ctx) {
+    cout<<"PrimaryExp"<<endl;
+    if (ctx->children.size() > 1) {
+        visitChildren(ctx);
+    } else if (ctx->children[0]->getText() == "lVal") {
+        visitChildren(ctx);
+    } else{
+        string number = ctx->children[0]->getText();
+        if (number.find(".") == string::npos) {
+            int value = 0;
+            if (number.length() > 1 && number[0] == '0' && (number[1] == 'x' || number[1] == 'X')) {
+                for (auto k : number)
+                    value = value * 16 + (k - '0');
+            } else if (number[0] == '0') {
+                for (auto k : number)
+                    value = value * 8 + (k - '0');
+            } else {
+                for (auto k : number)
+                    value = value * 10 + (k - '0');
+            }
+            ir.lst_type = Int;
+            ir.add_Int(value);
+        } else {
+            float value = stof(number);
+            ir.lst_type = Float;
+            ir.add_Float(value);
+        }
+    }
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
+    cout<<"Number"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitUnaryExp(SysYParser::UnaryExpContext *ctx) {
+    cout<<"UnaryExp"<<endl;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    }
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitUnaryOp(SysYParser::UnaryOpContext *ctx) {
+    cout<<"UnaryOp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitFuncRParams(SysYParser::FuncRParamsContext *ctx) {
+    cout<<"FuncRParams"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitMulExp(SysYParser::MulExpContext *ctx) {
+    cout<<"MulExp"<<endl;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        ctx->children[0]->accept(this);
+        IR::data left;
+        ctx->children[2]->accept(this);
+        IR::data right;
+        ir.add_MulExp(left, right);
+    }
+    return nullptr;
+}
+    
+antlrcpp::Any Visitor::visitAddExp(SysYParser::AddExpContext *ctx) {
+    cout<<"AddExp"<<endl;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        ctx->children[0]->accept(this);
+        IR::data left;
+        ctx->children[2]->accept(this);
+        IR::data right;
+        ir.add_AddExp(left,right);
+    }
+
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitRelExp(SysYParser::RelExpContext *ctx) {
+    cout<<"RelExp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitEqExp(SysYParser::EqExpContext *ctx) {
+    cout<<"EqExp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitLAndExp(SysYParser::LAndExpContext *ctx) {
+    cout<<"AndExp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitLOrExp(SysYParser::LOrExpContext *ctx) {
+    cout<<"LOrExp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitConstExp(SysYParser::ConstExpContext *ctx) {
+    cout<<"ConstExp"<<endl;
+    visitChildren(ctx);
+    return nullptr;
+}
+
+antlrcpp::Any Visitor::visitChildren(antlr4::tree::ParseTree *ctx) {
+    int n = ctx->children.size();
+    cout<<n<<endl;
+    for (int k = 0; k < n; k++) {
+        ctx->children[k]->accept(this);
+    }
+    return nullptr;    
+}
+
+

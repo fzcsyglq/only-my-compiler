@@ -1,0 +1,25 @@
+antlr4 -Dlanguage=Cpp SysY.g4 -visitor
+
+g++ main.cpp -o main -lantlr4-runtime
+
+~/.bashrc
+~/.bash_profile
+
+clang++ -S -emit-llvm main.cpp # main.ll
+clang++ -c -emit-llvm main.cpp # main.bc
+
+clang++ -target arm-linux-android23 -S 1.cpp -o 1.s
+clang++ -target armv7a-linux-androideabi16 -S 1.cpp -o 1.s
+
+alias x="g++ main.cpp visitor.cpp SysYLexer.cpp SysYParser.cpp ../ir/ir.cpp ../backend/asm.cpp -o main -lantlr4-runtime"
+
+https://azeria-labs.com/arm-instruction-set-part-3/
+
+as -g -mfpu=vfpv2 -o first.o first.s
+gcc -o first first.o
+
+sudo apt install build-essential gcc-arm-linux-gnueabihf
+
+g++ 2.cpp -march=armv7 -S
+//arm-linux-gnueabihf-gcc
+arm-linux-gnueabihf-as -g -o $1.o $1.asm && arm-linux-gnueabihf-gcc -g -o $1 $1.o

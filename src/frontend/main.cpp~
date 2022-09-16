@@ -1,0 +1,39 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+
+#include <fstream>
+
+#include "SysYLexer.h"
+#include "SysYParser.h"
+#include "visitor.h"
+#include "../ir/ir.h"
+
+using namespace antlr4;
+using namespace std;
+
+int main(int argc, char *argv[])
+{
+    string filename = argv[1];
+    ifstream source;
+    source.open(filename);
+
+    
+    ANTLRInputStream input(source);
+    SysYLexer lexer(&input);
+
+    CommonTokenStream tokens(&lexer);
+
+//    int n = tokens.getNumberOfOnChannelTokens();
+//    cout<<n<<endl;
+    
+    SysYParser parser(&tokens);
+
+    SysYParser::CompUnitContext *root = parser.compUnit();
+
+    IR::CompUnit ir(ir.content);
+    Visitor visitor(ir);
+    visitor.visitCompUnit(root);
+    return 0;
+}
