@@ -16,18 +16,11 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     string filename = argv[4];
-    ifstream source;
-    source.open(filename);
-
-    
+    ifstream source(filename);
+        
     ANTLRInputStream input(source);
-    SysYLexer lexer(&input);
-
-    CommonTokenStream tokens(&lexer);
-
-//    int n = tokens.getNumberOfOnChannelTokens();
-//    cout<<n<<endl;
-    
+    SysYLexer lexer(&input);    
+    CommonTokenStream tokens(&lexer);    
     SysYParser parser(&tokens);
 
     SysYParser::CompUnitContext *root = parser.compUnit();
@@ -39,7 +32,7 @@ int main(int argc, char *argv[])
     ofstream out;
     string out_filename = argv[3];
     out.open(out_filename);
-    ASM::Asm Aas;
-    Aas.get_asm(&ir, out);
+    ASM::Asm Asm;
+    Asm.get_asm(&ir, out);
     return 0;
 }

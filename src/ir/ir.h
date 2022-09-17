@@ -18,31 +18,60 @@ namespace IR {
     enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew};
     enum {Int, Float, Void};
 
+    class symbol_table {
+        
+    public:
+
+        
+    };    
+    
+    class data {
+        
+    public:
+        
+        int id;
+        string name;
+        bool is_global, is_const;
+        
+    };
+
+    class var_int : public data {
+
+    public:
+        
+        int value;
+        
+    };
+
+    class var_float : public data {
+        
+    public:
+        
+        float value;
+    };
+
+    class var_int_array : public data {
+        
+    public:
+
+        vector<int> value;
+        vector<int> size;
+        
+    };
+
+    class var_float_array : public data {
+        
+    public:
+
+        vector<float> value;
+        vector<int> size;
+    };
+
     class code {};
     
     class part : public code {};
 
-    class data {
-        
-    public:
-        int id, type, value, pos;
-        string name;
-        bool is_global, is_const;
-        vector<int> arr;
-        int arr_index;
-        
-        data() {
-            arr_index = 0;
-            pos = 0;
-            is_const = false;
-            value = 0;
-        }
-        data(int id, int type, bool is_global, int pos = 0, int value = 0, bool is_const = false):
-            id(id), type(type), is_global(is_global), pos(pos), value(value), is_const(is_const){
-            arr_index = 0;
-        }
-
-    };
+    
     
     class function : public code{
         data ret;
