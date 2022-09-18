@@ -7,15 +7,16 @@ class Visitor : public SysYBaseVisitor {
 
     enum { Int, Float, Void};
     
-    IR::CompUnit &ir;
+    IR::module *ir;
+
+    bool is_const, is_global;
     
 public:
 
     IR::data pre;
     int pre_pos, pre_dimension, pre_len; //arr init
     
-    Visitor(IR::CompUnit &_ir);
-
+    Visitor(IR::module *ir) : ir(ir){}
     
     virtual antlrcpp::Any visitCompUnit(SysYParser::CompUnitContext *ctx) override;
 

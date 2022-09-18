@@ -8,15 +8,18 @@
 #include "SysYParser.h"
 #include "visitor.h"
 #include "../ir/ir.h"
-#include "../backend/asm.h"
+//#include "../backend/asm.h"
 
 using namespace antlr4;
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    string filename = argv[4];
+    string filename = argv[1];
+    cout<<filename<<endl;
+ 
     ifstream source(filename);
+    
         
     ANTLRInputStream input(source);
     SysYLexer lexer(&input);    
@@ -25,14 +28,17 @@ int main(int argc, char *argv[])
 
     SysYParser::CompUnitContext *root = parser.compUnit();
 
-    IR::CompUnit ir(ir.content);
-    Visitor visitor(ir);
-    visitor.visitCompUnit(root);
+    IR::module ir;
+    Visitor visitor(&ir);
+    
+    int u = visitor.visitCompUnit(root);
+    return 0;
+    cout << u << endl;
 
-    ofstream out;
-    string out_filename = argv[3];
-    out.open(out_filename);
-    ASM::Asm Asm;
-    Asm.get_asm(&ir, out);
+    // ofstream out;
+    // string out_filename = argv[3];
+    // out.open(out_filename);
+    // ASM::Asm Asm;
+    // Asm.get_asm(&ir, out);
     return 0;
 }

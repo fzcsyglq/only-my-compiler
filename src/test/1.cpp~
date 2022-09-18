@@ -1,0 +1,17 @@
+int n = 100;
+
+int work() {
+    int x = 1;
+    int y = 100;
+    return x + y;
+}
+
+int main() {
+    int x = 100;
+    int z = 10 + x + x + x + x + x;
+    if (x) {
+        int zzz = 123456;
+        work();
+    }
+    return z;
+}

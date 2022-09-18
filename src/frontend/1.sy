@@ -1,4 +1,4 @@
 int main() {
-    const int x = 100;
+    int x = 100;
     return x;
 }

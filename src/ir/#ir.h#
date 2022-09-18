@@ -25,15 +25,13 @@ namespace IR {
         int id;
         string name;
         bool is_global, is_const;
-        
     };
 
     class var_int : public data {
 
     public:
         
-        int value;
-        
+        int value;        
     };
 
     class var_float : public data {
