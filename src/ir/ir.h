@@ -25,15 +25,13 @@ namespace IR {
         int id;
         string name;
         bool is_global, is_const;
-        
     };
 
     class var_int : public data {
 
     public:
         
-        int value;
-        
+        int value;        
     };
 
     class var_float : public data {
@@ -78,7 +76,11 @@ namespace IR {
     public:
 
         vector<data> global_var;
-        vector<function> functions;        
+        vector<function> functions;
+
+        void enter_function();
+        
+        void exit_function();
     };
 
     class function : public module{
@@ -96,6 +98,7 @@ namespace IR {
 
         int block_id;
         vector<instruction> instructions;
+
     };
 
     class instruction : block{

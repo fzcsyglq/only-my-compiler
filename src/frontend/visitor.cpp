@@ -14,7 +14,7 @@ antlrcpp::Any Visitor::visitCompUnit(SysYParser::CompUnitContext *ctx) {
     IR::data x;
 //    cout<<"CompUnit"<<endl;
     visitChildren(ctx);
-    return x;
+    return nullptr;
 }
 
 antlrcpp::Any Visitor::visitDecl(SysYParser::DeclContext *ctx) {
@@ -165,11 +165,12 @@ antlrcpp::Any Visitor::visitInitVal(SysYParser::InitValContext *ctx) {
     // } else {
     //     ir.add_VarDef2(pre.name, pre_pos);
     // }
-    // return nullptr;    
+    return nullptr;    
 }
 
 antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
 //    cout<<"FuncDef"<<endl;
+    
     // int type;    
     // string name = ctx->children[1]->getText();
     // if (ctx->children[0]->getText() == "Int") type = Int;
@@ -177,6 +178,22 @@ antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
     // ir.enter_Func(Int, name);
     // visitChildren(ctx);
     // ir.exit_Func();
+
+    ir->enter_function();
+    
+    int type;
+    if (ctx->children[0]->getText() == "Int") type = Int;
+    else if (ctx->children[0]->getText() == "Float") type = Float;
+    else type = Void;
+
+    
+    string name = ctx->children[1]->getText();
+
+    vector<IR::data> parameters;
+    for (auto k : ctx->children)
+        std::cout << k->getText() << std::endl;
+
+    ir->exit_function();
     return nullptr;
 }
 

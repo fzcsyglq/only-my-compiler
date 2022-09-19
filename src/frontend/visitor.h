@@ -8,8 +8,10 @@ class Visitor : public SysYBaseVisitor {
     enum { Int, Float, Void};
     
     IR::module *ir;
-
+    IR::data son;
+    
     bool is_const, is_global;
+
     
 public:
 

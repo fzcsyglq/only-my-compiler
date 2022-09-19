@@ -28,14 +28,15 @@ int main(int argc, char *argv[])
 
     SysYParser::CompUnitContext *root = parser.compUnit();
 
+    
     IR::module ir;
+
     Visitor visitor(&ir);
     
-    int u = visitor.visitCompUnit(root);
-    return 0;
-    cout << u << endl;
 
-    // ofstream out;
+    visitor.visitCompUnit(root);
+
+   // ofstream out;
     // string out_filename = argv[3];
     // out.open(out_filename);
     // ASM::Asm Asm;

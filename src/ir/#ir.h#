@@ -76,7 +76,11 @@ namespace IR {
     public:
 
         vector<data> global_var;
-        vector<function> functions;        
+        vector<function> functions;
+
+        void enter_function();
+        
+        void exit_function();
     };
 
     class function : public module{
@@ -85,6 +89,8 @@ namespace IR {
 
         int id_cnt;
         string function_name;
+        vector<data> parameters;
+        
         vector<block> blocks;
     };
     
@@ -94,6 +100,7 @@ namespace IR {
 
         int block_id;
         vector<instruction> instructions;
+
     };
 
     class instruction : block{
