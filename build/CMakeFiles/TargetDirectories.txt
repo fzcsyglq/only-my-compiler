@@ -1,0 +1,3 @@
+/home/fzcsyglq/桌面/only-my-compiler/build/CMakeFiles/rebuild_cache.dir
+/home/fzcsyglq/桌面/only-my-compiler/build/CMakeFiles/edit_cache.dir
+/home/fzcsyglq/桌面/only-my-compiler/build/CMakeFiles/compiler.dir
