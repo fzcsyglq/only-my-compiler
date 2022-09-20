@@ -77,19 +77,46 @@ namespace IR {
 
         vector<data> global_var;
         vector<function> functions;
+        module *fa;
 
-        void enter_function();
+        void enter_function(module *ir);
+
+        virtual void add_function_type(int type) {};
+
+        virtual void add_function_name(string name) {};
+
+        virtual void add_function_parameter(data parameter) {};
         
-        void exit_function();
+        void exit_function(module *ir);
+
     };
 
     class function : public module{
         
     public:
 
-        int id_cnt;
-        string function_name;
+        int id_cnt, return_type;        
+        string function_name;        
+        
+        class para_data {
+        public:
+            int type;
+            string name;
+            vector<data> exp;
+        };
+        vector<para_data> oparameters;
+        
         vector<block> blocks;
+        
+        function() {
+            id_cnt = 0;
+        }
+
+        void add_function_type(int type);
+
+        void add_function_name(string name);
+
+        void add_function_parameter(data parameter);
     };
     
     class block : function{

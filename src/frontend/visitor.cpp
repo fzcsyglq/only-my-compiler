@@ -179,22 +179,23 @@ antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
     // visitChildren(ctx);
     // ir.exit_Func();
 
-    ir->enter_function();
+    ir->enter_function(ir);
     
     int type;
     if (ctx->children[0]->getText() == "Int") type = Int;
     else if (ctx->children[0]->getText() == "Float") type = Float;
     else type = Void;
-
+    ir->add_function_type(type);
+    
     
     string name = ctx->children[1]->getText();
+    ir->add_function_name(name);
 
-    vector<IR::data> parameters;
-    for (auto k : ctx->children)
-        std::cout << k->getText() << std::endl;
-
-    ir->exit_function();
+    visitChildren(ctx);
+    
+    ir->exit_function(ir);
     return nullptr;
+
 }
 
 antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
@@ -204,6 +205,8 @@ antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
+
+    cout<<" "<<ctx->children.size()<<endl;
 //    cout<<"FuncFParams"<<endl;
     visitChildren(ctx);
     return nullptr;
@@ -212,6 +215,7 @@ antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
 antlrcpp::Any Visitor::visitFuncFParam(SysYParser::FuncFParamContext *ctx) {
 //    cout<<"FuncFParam"<<endl;
     visitChildren(ctx);
+    cout<<ctx->children.size()<<endl;
     return nullptr;
 }
 

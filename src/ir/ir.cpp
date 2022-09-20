@@ -185,3 +185,26 @@ using namespace std;
 //     var.pop_back();
 //     return;
 // }
+
+void IR::module::enter_function(module *ir) {
+    functions.push_back(IR::function());
+    fa = ir;
+    ir = &functions.back();
+}
+
+
+void IR::module::exit_function(module *ir) {
+    ir = fa;
+}
+
+void IR::function::add_function_type(int type) {
+    return_type = type;
+}
+
+void IR::function::add_function_name(string name) {
+    function_name = name;
+}
+
+void IR::function::add_function_parameter(data parameter) {
+//    parameters.push_back(parameter);
+}
