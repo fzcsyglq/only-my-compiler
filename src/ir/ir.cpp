@@ -188,12 +188,13 @@ using namespace std;
 
 void IR::module::enter_function(module *ir) {
     functions.push_back(IR::function());
-    fa = ir;
+    module *tem = ir;
     ir = &functions.back();
+    ir->fa = tem;
 }
 
 
-void IR::module::exit_function(module *ir) {
+void IR::function::exit_function(module *ir) {
     ir = fa;
 }
 
@@ -205,6 +206,22 @@ void IR::function::add_function_name(string name) {
     function_name = name;
 }
 
-void IR::function::add_function_parameter(data parameter) {
-//    parameters.push_back(parameter);
+IR::para_data* IR::function::add_function_parameter() {
+    parameters.push_back(para_data());
+    return &parameters.back();    
+}
+
+void IR::function::enter_block(module *ir) {
+    blocks.push_back(block(0));
+    module *tem = ir;    
+    ir = &blocks.back();
+    ir->fa = tem;    
+}
+
+void IR::block::exit_block(module *ir) {
+    ir = fa;
+}
+
+void IR::block::add_block_id(int id) {
+    block_id = id;
 }

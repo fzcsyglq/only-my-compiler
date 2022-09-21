@@ -14,9 +14,6 @@ class Visitor : public SysYBaseVisitor {
 
     
 public:
-
-    IR::data pre;
-    int pre_pos, pre_dimension, pre_len; //arr init
     
     Visitor(IR::module *ir) : ir(ir){}
     

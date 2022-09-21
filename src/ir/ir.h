@@ -58,6 +58,13 @@ namespace IR {
         vector<int> size;
     };
 
+    class para_data {
+    public:
+        int type;
+        string name;
+        vector<data> exp;
+    };
+
     class symbol_table {
         
     public:
@@ -85,26 +92,27 @@ namespace IR {
 
         virtual void add_function_name(string name) {};
 
-        virtual void add_function_parameter(data parameter) {};
+        virtual para_data* add_function_parameter() {};
         
-        void exit_function(module *ir);
+        virtual void exit_function(module *ir);
+
+        virtual void enter_block(module *ir);
+
+        virtual void add_block_id(module *ir);
+
+        virtual void exit_block(module *ir);
 
     };
 
-    class function : public module{
+    class function : public module {
         
     public:
 
         int id_cnt, return_type;        
         string function_name;        
         
-        class para_data {
-        public:
-            int type;
-            string name;
-            vector<data> exp;
-        };
-        vector<para_data> oparameters;
+        
+        vector<para_data> parameters;
         
         vector<block> blocks;
         
@@ -116,27 +124,38 @@ namespace IR {
 
         void add_function_name(string name);
 
-        void add_function_parameter(data parameter);
+        para_data* add_function_parameter();
+
+        void exit_function(module *ir);
+
+        void enter_block(module *ir);
     };
     
-    class block : function{
+    class block : public  function {
 
     public:
-
+        
         int block_id;
         vector<instruction> instructions;
 
+        block() {}
+        block(int id) : block_id(id) {}
+
+        void add_block_id(int id);
+        
+        void exit_block(module *ir);
+
     };
 
-    class instruction : block{
+    class instruction : public block{
 
     public:
         int type, instruction_id;
         data result, left, right;
-    };
 
-    
-    
+        
+    };
+        
 
     // class CompUnit {
         

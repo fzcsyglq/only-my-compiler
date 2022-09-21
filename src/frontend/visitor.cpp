@@ -8,8 +8,6 @@
 
 using namespace std;
 
-
-
 antlrcpp::Any Visitor::visitCompUnit(SysYParser::CompUnitContext *ctx) {
     IR::data x;
 //    cout<<"CompUnit"<<endl;
@@ -194,19 +192,20 @@ antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
     visitChildren(ctx);
     
     ir->exit_function(ir);
+
     return nullptr;
 
 }
 
 antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
-//    cout<<"FuncType"<<endl;
+//    cout<<"FuncType"<<endl;    
+    
     visitChildren(ctx);
     return nullptr;
 }
 
 antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
 
-    cout<<" "<<ctx->children.size()<<endl;
 //    cout<<"FuncFParams"<<endl;
     visitChildren(ctx);
     return nullptr;
@@ -214,14 +213,29 @@ antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
 
 antlrcpp::Any Visitor::visitFuncFParam(SysYParser::FuncFParamContext *ctx) {
 //    cout<<"FuncFParam"<<endl;
-    visitChildren(ctx);
+    IR::para_data *para = ir->add_function_parameter();
+    
+    if (ctx->children[0]->getText() == "Int") para->type = Int;
+    else para->type = Float;
+
+    para->name = ctx->children[1]->getText();
+
+    for (int k = 3; k < ctx->children.size(); k += 3) {
+        ctx->children[k]->accept(this);
+        para->exp.push_back(son);
+    }    
     cout<<ctx->children.size()<<endl;
     return nullptr;
 }
 
-antlrcpp::Any Visitor::visitBlock(SysYParser::BlockContext *ctx) {
+antlrcpp::Any Visitor::visitBlock(SysYParser::BlockContext *ctx) {    
 //    cout<<"Block"<<endl;
+    ir->enter_block(ir);    
+    ir->add_block_id(0);
+    
     visitChildren(ctx);
+    
+    ir->exit_block(ir);
     return nullptr;
 }
 
@@ -310,7 +324,7 @@ antlrcpp::Any Visitor::visitStmtContinue(SysYParser::StmtContinueContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitStmtReturn(SysYParser::StmtReturnContext *ctx) {
-//    cout<<"Stmt"<<endl;
+//    cout<<"Stmt"<<endl;    
     visitChildren(ctx);
 //    ir.add_Return();
     return nullptr;
