@@ -1,12 +1,4 @@
-#include <iostream>
-#include <algorithm>
-#include <cstdio>
-#include <cstring>
-#include <map>
-
 #include "ir.h"
-
-using namespace std;
 
 // void IR::CompUnit::add_VarDef1(IR::data _result) {
 //     IR::data result, left, right;
@@ -186,15 +178,35 @@ using namespace std;
 //     return;
 // }
 
-void IR::module::enter_function(module *ir) {
-    functions.push_back(IR::function());
-    module *tem = ir;
-    ir = &functions.back();
+IR::module::~module() {
+    for (auto k : functions) {        
+        delete k;
+    }
+}
+
+IR::function::~function(){
+    for (auto k : blocks) {
+        delete k;
+    }
+}
+
+IR::block::~block() {
+    for (auto k : instructions) {
+        delete k;
+    }
+    for (auto k : parameters) {
+        delete k;
+    }
+}
+
+void IR::module::enter_function(IR *ir) {    
+    functions.push_back(new function());
+    IR *tem = ir;
+    ir = functions.back();
     ir->fa = tem;
 }
 
-
-void IR::function::exit_function(module *ir) {
+void IR::function::exit_function(IR *ir) {
     ir = fa;
 }
 
@@ -207,18 +219,18 @@ void IR::function::add_function_name(string name) {
 }
 
 IR::para_data* IR::function::add_function_parameter() {
-    parameters.push_back(para_data());
-    return &parameters.back();    
+    parameters.push_back(new para_data());
+    return parameters.back();    
 }
 
-void IR::function::enter_block(module *ir) {
-    blocks.push_back(block(0));
-    module *tem = ir;    
-    ir = &blocks.back();
+void IR::function::enter_block(IR *ir) {
+    blocks.push_back(new block(0));
+    IR *tem = ir;    
+    ir = blocks.back();
     ir->fa = tem;    
 }
 
-void IR::block::exit_block(module *ir) {
+void IR::block::exit_block(IR *ir) {
     ir = fa;
 }
 

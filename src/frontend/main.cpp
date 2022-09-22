@@ -1,9 +1,4 @@
-#include <iostream>
-#include <cstdio>
-#include <cstring>
-#include <algorithm>
-#include <fstream>
-
+#include "../common/utility.h"
 #include "SysYLexer.h"
 #include "SysYParser.h"
 #include "visitor.h"
@@ -34,12 +29,12 @@ int main(int argc, char *argv[])
     Visitor visitor(&ir);
     
 
-    visitor.visitCompUnit(root);
+    visitor.visitCompUnit(root); 
 
-   // ofstream out;
+    // ofstream out;
     // string out_filename = argv[3];
     // out.open(out_filename);
     // ASM::Asm Asm;
-    // Asm.get_asm(&ir, out);
+     // Asm.get_asm(&ir, out);
     return 0;
 }

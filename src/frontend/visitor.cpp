@@ -9,7 +9,7 @@
 using namespace std;
 
 antlrcpp::Any Visitor::visitCompUnit(SysYParser::CompUnitContext *ctx) {
-    IR::data x;
+    Var::data x;
 //    cout<<"CompUnit"<<endl;
     visitChildren(ctx);
     return nullptr;
@@ -105,6 +105,13 @@ antlrcpp::Any Visitor::visitVarDecl(SysYParser::VarDeclContext *ctx) {
     // if (ir.is_global) ir.is_const = true;
     // visitChildren(ctx);
     // if (ir.is_global) ir.is_const = tem;
+
+    if (ctx->children[0]->getText() == "Int") {
+//        symbol_table.add_var_int(son);
+    } else {
+//        symbol_table.add_bar_int(son);
+    }
+    
     return nullptr;
 }
 
@@ -421,27 +428,25 @@ antlrcpp::Any Visitor::visitPrimaryExp3(SysYParser::PrimaryExp3Context *ctx) {
 
 antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
 //    cout<<"Number"<<endl;
-    // string number = ctx->children[0]->getText();
-    // if (number.find(".") == string::npos) {
-    //     int value = 0;
-    //     if (number.length() > 1 && number[0] == '0' && (number[1] == 'x' || number[1] == 'X')) {
-    //         for (auto k : number)
-    //             value = value * 16 + (k - '0');
-    //     } else if (number[0] == '0') {
-    //         for (auto k : number)
-    //             value = value * 8 + (k - '0'), cout<<k<<endl;
-    //     } else {
-    //         for (auto k : number)
-    //             value = value * 10 + (k - '0');
-    //     }
-    //     ir.lst_type = Int;
-    //     ir.lst_value = value;
-    //     ir.add_Int(value);
-    // } else {
-    //     float value = stof(number);
-    //     ir.lst_type = Float;
-    //     ir.add_Float(value);
-    // }
+    string number = ctx->children[0]->getText();
+    
+    if (number.find(".") == string::npos) {
+        int value = 0;
+        if (number.length() > 1 && number[0] == '0' && (number[1] == 'x' || number[1] == 'X')) {
+            for (auto k : number)
+                value = value * 16 + (k - '0');
+        } else if (number[0] == '0') {
+            for (auto k : number)
+                value = value * 8 + (k - '0'), cout<<k<<endl;
+        } else {
+            for (auto k : number)
+                value = value * 10 + (k - '0');
+        }
+        son = Var::var_int(value);
+    } else {
+        float value = stof(number);
+        son = Var::var_float(value);
+    }
     visitChildren(ctx);
     return nullptr;
 }

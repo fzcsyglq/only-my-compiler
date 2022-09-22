@@ -1,107 +1,60 @@
 #pragma once
 
-#include <iostream>
-#include <cstdio>
-#include <cstring>
-#include <algorithm>
-#include <vector>
-#include <map>
-#include <stack>
-
-using std::string;
-using std::vector;
-using std::map;
-using std::stack;
+#include "../common/utility.h"
+#include "../frontend/var.h"
 
 namespace IR {
     
     enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew};
-    enum {Int, Float, Void};
     
-    class data {
-        
-    public:
-        
-        int id;
-        string name;
-        bool is_global, is_const;
-    };
-
-    class var_int : public data {
-
-    public:
-        
-        int value;        
-    };
-
-    class var_float : public data {
-        
-    public:
-        
-        float value;
-    };
-
-    class var_int_array : public data {
-        
-    public:
-
-        vector<int> value;
-        vector<int> size;
-        
-    };
-
-    class var_float_array : public data {
-        
-    public:
-
-        vector<float> value;
-        vector<int> size;
-    };
-
-    class para_data {
-    public:
-        int type;
-        string name;
-        vector<data> exp;
-    };
-
-    class symbol_table {
-        
-    public:
-
-        vector<map<string, data>> var, var_array;
-        
-    };
 
     class module;
     class function;
     class block;
     class instruction;
-    
-    class module {
+    class para_data {
+    public:
+        int type;
+        string name;
+        vector<Var::data> exp;
+    };
+
+    class IR {
         
     public:
+        
+        IR *fa;
+        
+        virtual void enter_function(IR *ir) {};
 
-        vector<data> global_var;
-        vector<function> functions;
-        module *fa;
-
-        void enter_function(module *ir);
+        virtual void exit_function(IR *ir) {};
 
         virtual void add_function_type(int type) {};
 
         virtual void add_function_name(string name) {};
 
-        virtual para_data* add_function_parameter() {};
+        virtual para_data* add_function_parameter() {return nullptr;};
+
+        virtual void enter_block(IR *ir) {};
+
+        virtual void exit_block(IR *ir) {};
+
+        virtual void add_block_id(int id) {};
         
-        virtual void exit_function(module *ir);
+    };    
+    
+    class module : public IR {
+        
+    public:
+        
+        vector<Var::data> global_var;
+        vector<function*> functions;
 
-        virtual void enter_block(module *ir);
-
-        virtual void add_block_id(module *ir);
-
-        virtual void exit_block(module *ir);
-
+        module(){}
+        virtual ~module();
+        
+        void enter_function(IR *ir);
+        
     };
 
     class function : public module {
@@ -110,15 +63,16 @@ namespace IR {
 
         int id_cnt, return_type;        
         string function_name;        
+
+
+        vector<para_data*> parameters;
         
-        
-        vector<para_data> parameters;
-        
-        vector<block> blocks;
+        vector<block*> blocks;
         
         function() {
             id_cnt = 0;
         }
+        virtual ~function();
 
         void add_function_type(int type);
 
@@ -126,9 +80,9 @@ namespace IR {
 
         para_data* add_function_parameter();
 
-        void exit_function(module *ir);
+        void exit_function(IR *ir);
 
-        void enter_block(module *ir);
+        void enter_block(IR *ir);
     };
     
     class block : public  function {
@@ -136,23 +90,23 @@ namespace IR {
     public:
         
         int block_id;
-        vector<instruction> instructions;
+        vector<instruction*> instructions;
 
         block() {}
         block(int id) : block_id(id) {}
+        ~block();
 
         void add_block_id(int id);
         
-        void exit_block(module *ir);
+        void exit_block(IR *ir);
 
     };
 
-    class instruction : public block{
+    class instruction : public block {
 
     public:
         int type, instruction_id;
-        data result, left, right;
-
+        Var::data result, left, right;
         
     };
         

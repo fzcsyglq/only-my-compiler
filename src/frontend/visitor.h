@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SysYBaseVisitor.h"
+#include "../common/utility.h"
+#include "var.h"
 #include "../ir/ir.h"
 
 class Visitor : public SysYBaseVisitor {
@@ -8,7 +10,8 @@ class Visitor : public SysYBaseVisitor {
     enum { Int, Float, Void};
     
     IR::module *ir;
-    IR::data son;
+    Var::data son;
+    Var::symbol_table symbol_table;
     
     bool is_const, is_global;
 
