@@ -7,7 +7,6 @@ namespace IR {
     
     enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew};
     
-
     class module;
     class function;
     class block;
