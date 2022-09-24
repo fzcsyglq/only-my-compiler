@@ -349,8 +349,16 @@ antlrcpp::Any Visitor::visitCond(SysYParser::CondContext *ctx) {
     return nullptr;
 }
 
-antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
+antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {    
 //    cout<<"LVal"<<endl;
+    delete son;
+    std::string name = ctx->children[0]->getText();
+
+    if (ctx->children.size() == 1) {
+        son = symbol_table.get_var(name);
+    } else {
+        son = symbol_table.get_var_array(name);
+    }
     // string name = ctx->children[0]->getText();
     // ir.add_Int(0);
     // IR::data sum = IR::data(ir.lst, ir.lst_type, ir.is_global);
@@ -442,10 +450,12 @@ antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
             for (auto k : number)
                 value = value * 10 + (k - '0');
         }
-        son = Var::var_int(value);
+        delete son;
+        son = new Var::var_int(value);
     } else {
         float value = stof(number);
-        son = Var::var_float(value);
+        delete son;
+        son = new Var::var_float(value);
     }
     visitChildren(ctx);
     return nullptr;

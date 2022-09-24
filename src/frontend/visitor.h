@@ -10,7 +10,7 @@ class Visitor : public SysYBaseVisitor {
     enum { Int, Float, Void};
     
     IR::module *ir;
-    Var::data son;
+    Var::data *son;
     Var::symbol_table symbol_table;
     
     bool is_const, is_global;
@@ -18,7 +18,9 @@ class Visitor : public SysYBaseVisitor {
     
 public:
     
-    Visitor(IR::module *ir) : ir(ir){}
+    Visitor(IR::module *ir) : ir(ir) {
+        son = new Var::data();
+    }
     
     virtual antlrcpp::Any visitCompUnit(SysYParser::CompUnitContext *ctx) override;
 

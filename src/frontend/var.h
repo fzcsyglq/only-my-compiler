@@ -12,6 +12,8 @@ namespace Var {
         int id;
         string name;
         bool is_global, is_const;
+
+        void add_name(string name);
     };
 
     class var_int : public data {
@@ -54,6 +56,9 @@ namespace Var {
     public:
 
         vector<map<string, data>> var, var_array;
-        
+
+        data* get_var(string name);
+
+        data* get_var_array(string name);
     };
 }
