@@ -254,6 +254,7 @@ antlrcpp::Any Visitor::visitBlockItem(SysYParser::BlockItemContext *ctx) {
 
 antlrcpp::Any Visitor::visitStmtAssignment(SysYParser::StmtAssignmentContext *ctx) {
 //    cout<<"Stmt"<<endl;
+    
     // IR::data result = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
     // result.name = ctx->children[0]->getText();
     // result.pos = 1;
