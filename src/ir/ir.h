@@ -39,7 +39,6 @@ namespace IR {
         virtual void exit_block(IR *ir) {};
 
         virtual void add_block_id(int id) {};
-        
     };    
     
     class module : public IR {

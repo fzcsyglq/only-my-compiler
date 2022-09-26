@@ -9,8 +9,9 @@ class Visitor : public SysYBaseVisitor {
 
     enum { Int, Float, Void};
     
-    IR::module *ir;
+    IR::IR *ir;
     Var::data *son;
+    int decl_type;
     Var::symbol_table symbol_table;
     
     bool is_const, is_global;
@@ -18,7 +19,7 @@ class Visitor : public SysYBaseVisitor {
     
 public:
     
-    Visitor(IR::module *ir) : ir(ir) {
+    Visitor(IR::IR *ir) : ir(ir) {
         son = new Var::data();
     }
     

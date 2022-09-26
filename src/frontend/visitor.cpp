@@ -16,7 +16,7 @@ antlrcpp::Any Visitor::visitCompUnit(SysYParser::CompUnitContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitDecl(SysYParser::DeclContext *ctx) {
-//    cout<<"Decl"<<endl;
+//    cout<<"Decl"<<endl;        
     visitChildren(ctx);
     return nullptr;
 }
@@ -32,16 +32,28 @@ antlrcpp::Any Visitor::visitConstDecl(SysYParser::ConstDeclContext *ctx) {
 
 antlrcpp::Any Visitor::visitBType(SysYParser::BTypeContext *ctx) {
 //    cout<<"BType"<<endl;
-    // if (ctx->getText() == "void") ir.pre_type = Void;
-    // else if (ctx->getText() == "int") ir.pre_type = Int;
-    // else ir.pre_type = Float;
-     
+    if (ctx->getText() == "Int") decl_type = Int;
+    else decl_type = Float;
     // visitChildren(ctx);
     // ir.pre_type = -1;
     return nullptr;
 }
 
 antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
+    if (ctx->children[1]->getText() != "[") {
+        if (decl_type == Int) {
+            *son = Var::var_int(0);
+            visitChildren(ctx);
+            son->to_int(son, ir);
+        } else {
+            *son = Var::var_float(0.0);
+            visitChildren(ctx);
+            son->to_float(son, ir);
+        }        
+    } else {
+        if (decl_type == Int) var = new Var::var_int_array();
+        else var = new Var::var_float_array();
+    }
 //    cout<<"ConstDef"<<endl;    
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
     // pre.name = ctx->children[0]->getText();
@@ -107,6 +119,7 @@ antlrcpp::Any Visitor::visitVarDecl(SysYParser::VarDeclContext *ctx) {
     // if (ir.is_global) ir.is_const = tem;
 
     if (ctx->children[0]->getText() == "Int") {
+        
 //        symbol_table.add_var_int(son);
     } else {
 //        symbol_table.add_bar_int(son);
@@ -352,14 +365,23 @@ antlrcpp::Any Visitor::visitCond(SysYParser::CondContext *ctx) {
 
 antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {    
 //    cout<<"LVal"<<endl;
-    delete son;
+    
+    Var::data *var;
     std::string name = ctx->children[0]->getText();
 
     if (ctx->children.size() == 1) {
-        son = symbol_table.get_var(name);
+        var = symbol_table.get_var(name);        
+        *son = *var;
     } else {
-        son = symbol_table.get_var_array(name);
+        var = symbol_table.get_var_array(name);
+        for (int k = 2; k <= ctx->children.size(); k++) {
+            ctx->children[k]->accept(this);            
+            var->add_size(son);
+        }
+        *son = *var;
     }
+    visitChildren(ctx);
+    
     // string name = ctx->children[0]->getText();
     // ir.add_Int(0);
     // IR::data sum = IR::data(ir.lst, ir.lst_type, ir.is_global);
@@ -451,12 +473,11 @@ antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
             for (auto k : number)
                 value = value * 10 + (k - '0');
         }
-        delete son;
-        son = new Var::var_int(value);
+        (*son) = Var::var_int(value);
     } else {
         float value = stof(number);
         delete son;
-        son = new Var::var_float(value);
+        (*son) = Var::var_float(value);
     }
     visitChildren(ctx);
     return nullptr;

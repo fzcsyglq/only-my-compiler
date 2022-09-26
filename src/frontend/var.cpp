@@ -19,3 +19,11 @@ Var::data* Var::symbol_table::get_var_array(string name) {
         }
     }
 }
+
+void Var::var_int_array::add_size(data *array_size) {
+    size.push_back(*array_size);
+}
+
+void Var::var_float_array::add_size(data *array_size) {
+    size.push_back(*array_size);    
+}

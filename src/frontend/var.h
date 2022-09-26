@@ -1,19 +1,28 @@
 #pragma once
 
 #include "../common/utility.h"
-
-enum {Int, Float, Void};
+#include "../ir/ir.h"
 
 namespace Var {
+    
+    enum {Int, Float, Void};
+    
     class data {
         
-    public:
+    public:        
         
         int id;
         string name;
         bool is_global, is_const;
 
+        data(){}
+        virtual ~data(){}
+
         void add_name(string name);
+        
+        virtual void add_size(data *array_size);
+
+        virtual void to_int(IR:: ir *);
     };
 
     class var_int : public data {
@@ -39,7 +48,9 @@ namespace Var {
     public:
 
         vector<int> value;
-        vector<int> size;
+        vector<data> size;
+
+        void add_size(data *array_size);
         
     };
 
@@ -48,8 +59,11 @@ namespace Var {
     public:
 
         vector<float> value;
-        vector<int> size;
+        vector<data> size;
+
+        void add_size(data *array_size);
     };
+
 
     class symbol_table {
         
