@@ -22,6 +22,10 @@ public:
     Visitor(IR::IR *ir) : ir(ir) {
         son = new Var::data();
     }
+
+    ~Visitor() {
+        delete son;
+    }
     
     virtual antlrcpp::Any visitCompUnit(SysYParser::CompUnitContext *ctx) override;
 

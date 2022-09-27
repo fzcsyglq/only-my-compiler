@@ -188,12 +188,6 @@ IR::function::~function(){
     for (auto k : blocks) {
         delete k;
     }
-}
-
-IR::block::~block() {
-    for (auto k : instructions) {
-        delete k;
-    }
     for (auto k : parameters) {
         delete k;
     }
@@ -205,7 +199,22 @@ void IR::module::enter_function(IR *ir) {
     ir = functions.back();
     ir->fa = tem;
 }
-
+// void IR::module::add_instruction(int type, Var::data result, Var::data left, Var::data right) {
+//     instructions.push_back(instruction(type, result, left, right));
+//     return;
+// }
+void IR::module::to_int(Var::data *son) {
+    if (son->type == Int) return;
+    else *son = Var::var_float((int)dynamic_cast<Var::var_int*>(son)->value);
+}
+void IR::module::to_float(Var::data *son) {
+    if (son->type == Float) return;
+    else *son = Var::var_float((float)dynamic_cast<Var::var_float*>(son)->value);
+}
+void IR::module::add_def(string name, Var::data *son) {
+    global_var.push_back(*son);
+    global_var.back().add_name(name);    
+}
 void IR::function::exit_function(IR *ir) {
     ir = fa;
 }
@@ -224,7 +233,7 @@ IR::para_data* IR::function::add_function_parameter() {
 }
 
 void IR::function::enter_block(IR *ir) {
-    blocks.push_back(new block(0));
+    blocks.push_back(new block(++id_cnt));
     IR *tem = ir;    
     ir = blocks.back();
     ir->fa = tem;    
@@ -236,4 +245,38 @@ void IR::block::exit_block(IR *ir) {
 
 void IR::block::add_block_id(int id) {
     block_id = id;
+}
+void IR::block::add_instruction(int type, Var::data result, Var::data left = Var::data(), Var::data right = Var::data()) {
+    instructions.push_back(instruction(type, result, left, right));
+}
+void IR::block::add_to_int(Var::data *son) {
+    if (son->type == Int) return;
+    else {
+        if (son->is_const) {
+            *son = Var::var_int((int)dynamic_cast<Var::var_int*>(son)->value);
+        } else {
+            Var::data result;
+            result.add_id(++id_cnt);
+            result.add_type(Int);
+            add_instruction(Fptosi, result, *son);
+            *son = result;
+        }
+    }
+}
+void IR::block::add_to_float(Var::data *son) {
+    if (son->type == Float) return;
+    else {
+        if (son->is_const) {
+            *son = Var::var_float((float)dynamic_cast<Var::var_int*>(son)->value);
+        } else {
+            Var::data result;
+            result.add_id(++id_cnt);
+            result.add_type(Float);
+            add_instruction(Sitofp, result, *son);
+            *son = result;
+        }
+    }
+}
+void IR::block::add_def(string name, Var::data *son) {
+    add_instruction(Store, *son);
 }

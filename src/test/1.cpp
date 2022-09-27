@@ -1,5 +1,5 @@
 int main() {
     float x = 111.111;
-    int y = x;
+    float z = x;
     return 0;
 }

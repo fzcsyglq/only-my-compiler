@@ -40,19 +40,27 @@ antlrcpp::Any Visitor::visitBType(SysYParser::BTypeContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
+    string name = ctx->children[0]->getText();
     if (ctx->children[1]->getText() != "[") {
         if (decl_type == Int) {
-            *son = Var::var_int(0);
-            visitChildren(ctx);
-            son->to_int(son, ir);
+            *son = Var::var_int();            
+            visitChildren(ctx);            
+            ir->add_to_int(son);
+            ir->add_def(name, son);
+            symbol_table.add_var(name, son);
         } else {
-            *son = Var::var_float(0.0);
-            visitChildren(ctx);
-            son->to_float(son, ir);
+            *son = Var::var_float();
+            visitChildren(ctx);           
+            ir->add_to_float(son);
+            ir->add_def(name, son);
+            symbol.table.add_var(name, son);
         }        
     } else {
-        if (decl_type == Int) var = new Var::var_int_array();
-        else var = new Var::var_float_array();
+        if (decl_type == Int) {
+            var = new Var::var_int_array();
+        } else {
+            var = new Var::var_float_array();
+        }
     }
 //    cout<<"ConstDef"<<endl;    
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
@@ -368,7 +376,7 @@ antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
     
     Var::data *var;
     std::string name = ctx->children[0]->getText();
-
+    var->add_name(name);
     if (ctx->children.size() == 1) {
         var = symbol_table.get_var(name);        
         *son = *var;
@@ -473,11 +481,11 @@ antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
             for (auto k : number)
                 value = value * 10 + (k - '0');
         }
-        (*son) = Var::var_int(value);
+        *son = Var::var_int(value);
     } else {
         float value = stof(number);
         delete son;
-        (*son) = Var::var_float(value);
+        *son = Var::var_float(value);
     }
     visitChildren(ctx);
     return nullptr;

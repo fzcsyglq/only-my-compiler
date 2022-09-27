@@ -5,7 +5,8 @@
 
 namespace IR {
     
-    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew};
+    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew, Fptosi, Sitofp};
+    enum {Int, Float, Void};
     
     class module;
     class function;
@@ -39,6 +40,14 @@ namespace IR {
         virtual void exit_block(IR *ir) {};
 
         virtual void add_block_id(int id) {};
+
+        virtual void add_to_int(Var::data *son) {};
+
+        virtual void add_to_float(Var::data *son) {};
+
+        virtual void add_def(string name, Var::data *son) {};
+
+        virtual void add_instruction(int type, Var::data result, Var::data left, Var::data right) {};
     };    
     
     class module : public IR {
@@ -52,7 +61,12 @@ namespace IR {
         virtual ~module();
         
         void enter_function(IR *ir);
+            
+        void to_int(Var::data *son);
+
+        void to_float(Var::data *son);
         
+        void add_def(string name, Var::data *son);
     };
 
     class function : public module {
@@ -68,7 +82,7 @@ namespace IR {
         vector<block*> blocks;
         
         function() {
-            id_cnt = 0;
+            id_cnt = -1;
         }
         virtual ~function();
 
@@ -88,24 +102,34 @@ namespace IR {
     public:
         
         int block_id;
-        vector<instruction*> instructions;
+        vector<instruction> instructions;
 
         block() {}
         block(int id) : block_id(id) {}
-        ~block();
+        ~block() {}
 
         void add_block_id(int id);
         
         void exit_block(IR *ir);
 
+        void add_to_int(Var::data *son);
+
+        void add_to_float(Var::data *son);
+        
+        void add_def(string name, Var::data *son);
+
+        void add_instruction(int type, Var::data result, Var::data left, Var::data right);
     };
 
     class instruction : public block {
 
     public:
+                
         int type, instruction_id;
         Var::data result, left, right;
-        
+
+        instruction(int type, Var::data result, Var::data left, Var::data right):
+            type(type), result(result), left(left), right(right) {}
     };
         
 
