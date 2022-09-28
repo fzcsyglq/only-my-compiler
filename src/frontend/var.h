@@ -22,8 +22,9 @@ namespace Var {
 
         void add_type(int type);
         
-        virtual void add_size(data *array_size);
+        virtual void add_size(data *array_size) {};
 
+        virtual data* copy(){};
     };
 
     class var_int : public data {
@@ -35,7 +36,7 @@ namespace Var {
         var_int(int value = 0) : value(value) {
             type = Int;
         }
-
+        data* copy();
     };
 
     class var_float : public data {
@@ -47,9 +48,18 @@ namespace Var {
         var_float(float value = 0.0) : value(value){
             type = Float;
         }
-
+        data* copy();
     };
+    
+    class var_bool : public data {
+        
+    public:
 
+        bool value;
+
+        data* copy();
+    };
+        
     class var_int_array : public data {
         
     public:
@@ -62,7 +72,8 @@ namespace Var {
         }
         
         void add_size(data *array_size);
-        
+
+        data* copy();
     };
 
     class var_float_array : public data {
@@ -77,6 +88,8 @@ namespace Var {
         }
         
         void add_size(data *array_size);
+
+        data* copy();
     };
 
 
@@ -84,17 +97,23 @@ namespace Var {
         
     public:
         
-        vector<map<string, data>> var, var_array;
+        vector<map<string, data*>> var, var_array;
 
         symbol_table() {
-            var.push_back(map<string, data>());
-            var_array.push_back(map<string, data>());
+            in_stack();
         }
+        ~symbol_table(); 
+
+        void in_stack();
+
+        void out_stack();
 
         data* get_var(string name);
 
         data* get_var_array(string name);
 
         void add_var(string name, data* son);
+
+        void add_var_array(string name, data* son);
     };
 }

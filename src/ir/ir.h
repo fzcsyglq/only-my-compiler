@@ -5,7 +5,7 @@
 
 namespace IR {
     
-    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew, Fptosi, Sitofp};
+    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew, Fptosi, Sitofp, Fneg};
     enum {Int, Float, Void};
     
     class module;
@@ -47,14 +47,21 @@ namespace IR {
 
         virtual void add_def(string name, Var::data *son) {};
 
-        virtual void add_instruction(int type, Var::data result, Var::data left, Var::data right) {};
-    };    
+        virtual void add_instruction(int type, Var::data *result, Var::data *left = nullptr, Var::data *right = nullptr) {};
+
+        virtual void add_unary_minus(Var::data *son) {}
+
+        virtual void add_unary_not(Var::data *son) {}
+
+        virtual void add_binary_exp(int type, Var::data *son, Var::data *left, Var::data *right) {}
+    };
+    
     
     class module : public IR {
         
     public:
-        
-        vector<Var::data> global_var;
+        int id_cnt;
+        vector<Var::data*> global_var;
         vector<function*> functions;
 
         module(){}
@@ -62,18 +69,24 @@ namespace IR {
         
         void enter_function(IR *ir);
             
-        void to_int(Var::data *son);
+        void add_to_int(Var::data *son);
 
-        void to_float(Var::data *son);
+        void add_to_float(Var::data *son);
+
+        void add_unary_minus(Var::data *son);
+
+        void add_mul_exp();
         
         void add_def(string name, Var::data *son);
+
+        void add_binary_exp(int type, Var::data *son, Var::data *left, Var::data *right);
     };
 
     class function : public module {
         
     public:
 
-        int id_cnt, return_type;        
+        int return_type;        
         string function_name;        
 
 
@@ -102,11 +115,11 @@ namespace IR {
     public:
         
         int block_id;
-        vector<instruction> instructions;
+        vector<instruction*> instructions;
 
         block() {}
         block(int id) : block_id(id) {}
-        ~block() {}
+        virtual ~block();
 
         void add_block_id(int id);
         
@@ -116,9 +129,11 @@ namespace IR {
 
         void add_to_float(Var::data *son);
         
+        void add_unary_minus(Var::data *son);
+        
         void add_def(string name, Var::data *son);
 
-        void add_instruction(int type, Var::data result, Var::data left, Var::data right);
+        void add_instruction(int type, Var::data *result, Var::data *left, Var::data *right);
     };
 
     class instruction : public block {
@@ -126,10 +141,12 @@ namespace IR {
     public:
                 
         int type, instruction_id;
-        Var::data result, left, right;
-
-        instruction(int type, Var::data result, Var::data left, Var::data right):
+        Var::data *result, *left, *right;
+        
+        instruction(){}        
+        instruction(int type, Var::data *result, Var::data *left, Var::data *right):
             type(type), result(result), left(left), right(right) {}
+        ~instruction();
     };
         
 

@@ -42,25 +42,35 @@ antlrcpp::Any Visitor::visitBType(SysYParser::BTypeContext *ctx) {
 antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
     string name = ctx->children[0]->getText();
     if (ctx->children[1]->getText() != "[") {
+        delete son;
         if (decl_type == Int) {
-            *son = Var::var_int();            
+            son = new Var::var_int();            
             visitChildren(ctx);            
             ir->add_to_int(son);
             ir->add_def(name, son);
-            symbol_table.add_var(name, son);
         } else {
-            *son = Var::var_float();
+            son = new Var::var_float();
             visitChildren(ctx);           
             ir->add_to_float(son);
             ir->add_def(name, son);
-            symbol.table.add_var(name, son);
-        }        
+        }
+        symbol.table.add_var(name, son);
     } else {
+        Var::data var;
         if (decl_type == Int) {
             var = new Var::var_int_array();
+            for (int k = 2; k <= ctx->children.size(); k += 3) {
+                ctx->children[k]->accept(this);
+                var->add_size(son);
+            }
         } else {
             var = new Var::var_float_array();
+            for (int k = 2; k <= ctx->children.size(); k += 3) {
+                ctx->children[k]->accept(this);
+                var->add_size(son);
+            }
         }
+        symbol.table.add_var_array(name, son);
     }
 //    cout<<"ConstDef"<<endl;    
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
@@ -138,6 +148,38 @@ antlrcpp::Any Visitor::visitVarDecl(SysYParser::VarDeclContext *ctx) {
 
 antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
 //    cout<<"VarDef"<<endl;
+    string name = ctx->children[0]->getText();
+    if (ctx->children[1]->getText() != "[") {
+        delete son;
+        if (decl_type == Int) {
+            son = new Var::var_int();            
+            visitChildren(ctx);            
+            ir->add_to_int(son);
+            ir->add_def(name, son);
+        } else {
+            son = new Var::var_float();
+            visitChildren(ctx);           
+            ir->add_to_float(son);
+            ir->add_def(name, son);
+        }
+        symbol.table.add_var(name, son);
+    } else {
+        Var::data var;
+        if (decl_type == Int) {
+            var = new Var::var_int_array();
+            for (int k = 2; k <= ctx->children.size(); k += 3) {
+                ctx->children[k]->accept(this);
+                var->add_size(son);
+            }
+        } else {
+            var = new Var::var_float_array();
+            for (int k = 2; k <= ctx->children.size(); k += 3) {
+                ctx->children[k]->accept(this);
+                var->add_size(son);
+            }
+        }
+        symbol.table.add_var_array(name, son);
+    }
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
     // pre.name = ctx->children[0]->getText();
     // pre.pos = 1;
@@ -206,6 +248,7 @@ antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
     // ir.exit_Func();
 
     ir->enter_function(ir);
+    symbol_table.in_stack();
     
     int type;
     if (ctx->children[0]->getText() == "Int") type = Int;
@@ -218,7 +261,8 @@ antlrcpp::Any Visitor::visitFuncDef(SysYParser::FuncDefContext *ctx) {
     ir->add_function_name(name);
 
     visitChildren(ctx);
-    
+
+    symbol_table.out_stack();
     ir->exit_function(ir);
 
     return nullptr;
@@ -371,7 +415,7 @@ antlrcpp::Any Visitor::visitCond(SysYParser::CondContext *ctx) {
     return nullptr;
 }
 
-antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {    
+antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
 //    cout<<"LVal"<<endl;
     
     Var::data *var;
@@ -387,7 +431,7 @@ antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
             var->add_size(son);
         }
         *son = *var;
-    }
+    }//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     visitChildren(ctx);
     
     // string name = ctx->children[0]->getText();
@@ -481,20 +525,25 @@ antlrcpp::Any Visitor::visitNumber(SysYParser::NumberContext *ctx) {
             for (auto k : number)
                 value = value * 10 + (k - '0');
         }
-        *son = Var::var_int(value);
+        delete son;
+        son = new Var::var_int(value);
     } else {
         float value = stof(number);
         delete son;
-        *son = Var::var_float(value);
+        son = new Var::var_float(value);
     }
+    son->is_const = true;
     visitChildren(ctx);
     return nullptr;
 }
 
 antlrcpp::Any Visitor::visitUnaryExp(SysYParser::UnaryExpContext *ctx) {
 //    cout<<"UnaryExp"<<endl;
-    if (ctx->children.size() == 1) {
-        visitChildren(ctx);
+    visitChildren(ctx);
+    if (ctx->children[0]->getText() == "-") {
+        ir->add_unary_minus(son);
+    } else {
+        ir->add_unary_not(son);
     }
     return nullptr;
 }
@@ -511,47 +560,49 @@ antlrcpp::Any Visitor::visitFuncRParams(SysYParser::FuncRParamsContext *ctx) {
     return nullptr;
 }
 
-antlrcpp::Any Visitor::visitMulExp(SysYParser::MulExpContext *ctx) {
+antlrcpp::Any Visitor::visitMulExp(SysYParser::MulExpContext *ctx) {    
 //    cout<<"MulExp"<<endl;
-    // if (ctx->children.size() == 1) {
-    //     visitChildren(ctx);
-    // } else {
-    //     ctx->children[0]->accept(this);
-    //     IR::data left = IR::data(ir.lst, ir.lst_type, ir.is_global);
-    //     if (ir.is_const) left.value = ir.lst_value;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        ctx->children[0]->accept(this);        
+        IR::data *left = son->copy();
         
-    //     ctx->children[2]->accept(this);
-    //     IR::data right = IR::data(ir.lst, ir.lst_type, ir.is_global);
-    //     if (ir.is_const) right.value = ir.lst_value;
+        ctx->children[2]->accept(this);
+        IR::data *right = son->copy();
 
-    //     int type;
-    //     if (ctx->children[1]->getText() == "*") type = IR::Mul;
-    //     else if (ctx->children[1]->getText() == "/") type = IR::Sdiv;
-    //     else type = IR::Srew;
-    //     ir.add_MulExp(type, left, right);
-    // }
+        int type;
+        if (ctx->children[1]->getText() == "*") type = IR::Mul;
+        else if (ctx->children[1]->getText() == "/") type = IR::Sdiv;
+        else type = IR::Srew;
+        
+        ir->add_binary_exp(type, son, left, right);
+        delete left;
+        delete right;
+    }
 
     return nullptr;
 }
     
 antlrcpp::Any Visitor::visitAddExp(SysYParser::AddExpContext *ctx) {
 //    cout<<"AddExp"<<endl;    
-    // if (ctx->children.size() == 1) {
-    //     visitChildren(ctx);
-    // } else {
-    //     ctx->children[0]->accept(this);
-    //     IR::data left = IR::data(ir.lst, ir.lst_type, ir.is_global);
-    //     if (ir.is_const) left.value = ir.lst_value;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        ctx->children[0]->accept(this);
+        IR::data left = son->copy();
         
-    //     ctx->children[2]->accept(this);
-    //     IR::data right = IR::data(ir.lst, ir.lst_type, ir.is_global);
-    //     if (ir.is_const) left.value = ir.lst_value;
+        ctx->children[2]->accept(this);
+        IR::data right = son->copy();
         
-    //     int type;
-    //     if (ctx->children[1]->getText() == "+") type = IR::Add;
-    //     else type = IR::Sub;
-    //     ir.add_MulExp(type, left, right);
-    // }
+        int type;
+        if (ctx->children[1]->getText() == "+") type = IR::Add;
+        else type = IR::Sub;
+        
+        ir->add_binary_exp(type, son, left, right);
+        delete left;
+        delete right;
+    }
 
     return nullptr;
 }
