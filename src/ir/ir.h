@@ -5,7 +5,7 @@
 
 namespace IR {
     
-    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew, Fptosi, Sitofp, Fneg};
+    enum {Alloca, Store, Load, Br, Call, Const, Ret, Function, Add, Sub, Mul, Sdiv, Srew, Fptosi, Sitofp, Fneg, Gep};
     enum {Int, Float, Void};
     
     class module;
@@ -54,6 +54,8 @@ namespace IR {
         virtual void add_unary_not(Var::data *son) {}
 
         virtual void add_binary_exp(int type, Var::data *son, Var::data *left, Var::data *right) {}
+
+        virtual void add_gep(Var::data *son, Var::data *left, Var::data *right) {}
     };
     
     
@@ -80,6 +82,8 @@ namespace IR {
         void add_def(string name, Var::data *son);
 
         void add_binary_exp(int type, Var::data *son, Var::data *left, Var::data *right);
+
+        void add_gep(Var::data *son, Var::data *left, Var::data *right);
     };
 
     class function : public module {

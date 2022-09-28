@@ -12,7 +12,7 @@ namespace Var {
         
         int id, type;
         string name;
-        bool is_global, is_const;
+        bool is_const;
         data(){}
         virtual ~data(){}
 
@@ -22,9 +22,15 @@ namespace Var {
 
         void add_type(int type);
         
-        virtual void add_size(data *array_size) {};
+        virtual void add_size(int array_size) {}
 
-        virtual data* copy(){};
+        virtual int get_size(int dimension) {}
+
+        virtual void alloca() {}
+
+        virtual void change(int pos, data *son) {}
+
+        virtual data* copy() {}
     };
 
     class var_int : public data {
@@ -35,6 +41,7 @@ namespace Var {
         
         var_int(int value = 0) : value(value) {
             type = Int;
+            is_const = true;
         }
         data* copy();
     };
@@ -47,6 +54,7 @@ namespace Var {
         
         var_float(float value = 0.0) : value(value){
             type = Float;
+            is_const = true;
         }
         data* copy();
     };
@@ -64,15 +72,22 @@ namespace Var {
         
     public:
 
-        vector<int> value;
-        vector<data> size;
-
+        vector<data*> value;
+        vector<int> size;
+        
         var_int_array() {
             type = Int;
         }
+        ~var_int_array();
         
-        void add_size(data *array_size);
+        void add_size(int dimension);
 
+        int get_size(int pos);
+
+        void alloca();
+
+        void change(int pos, data *son);
+        
         data* copy();
     };
 
@@ -80,14 +95,21 @@ namespace Var {
         
     public:
 
-        vector<float> value;
-        vector<data> size;
+        vector<data*> value;
+        vector<int> size;
 
         var_float_array() {
             type = Float;
         }
+        ~var_float_array();
         
-        void add_size(data *array_size);
+        void add_size(int dimension);
+
+        int get_size(int pos);
+
+        void alloca();
+
+        void change(int pos, data *son);
 
         data* copy();
     };

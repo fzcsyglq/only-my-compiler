@@ -53,11 +53,11 @@ int Var::var_float_array::get_size(int dimension) {
 }
 void Var::var_int_array::alloca() {
     for (int k = 1; k <= get_size(0); k++)
-        value.push_back(new var_int(0));
+        value.push_back(new var_int());
 }
 void Var::var_float_array::alloca() {
     for (int k = 1; k <= get_size(0); k++)
-        value.push_back(new var_float(0.0));
+        value.push_back(new var_float());
 }
 void Var::var_int_array::change(int pos, data *son) {
     delete value[pos];

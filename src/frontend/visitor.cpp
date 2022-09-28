@@ -50,27 +50,32 @@ antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
             ir->add_def(name, son);
         } else {
             son = new Var::var_float();
-            visitChildren(ctx);           
+            visitChildren(ctx);            
             ir->add_to_float(son);
             ir->add_def(name, son);
         }
-        symbol.table.add_var(name, son);
+        symbol_table.add_var(name, son);
     } else {
-        Var::data var;
+        Var::data *var;
         if (decl_type == Int) {
             var = new Var::var_int_array();
-            for (int k = 2; k <= ctx->children.size(); k += 3) {
+            for (int k = 2; k < ctx->children.size(); k += 3) {                
                 ctx->children[k]->accept(this);
-                var->add_size(son);
+                var->add_size(dynamic_cast<Var::var_int*>(son)->value);
             }
+            var->alloca();           
         } else {
             var = new Var::var_float_array();
-            for (int k = 2; k <= ctx->children.size(); k += 3) {
+            for (int k = 2; k < ctx->children.size(); k += 3) {
                 ctx->children[k]->accept(this);
-                var->add_size(son);
+                var->add_size(dynamic_cast<Var::var_float*>(son)->value);
             }
+            var->alloca();
         }
-        symbol.table.add_var_array(name, son);
+        delete son;
+        son = var;
+        ctx->children.back()->accept(this);
+        symbol_table.add_var_array(name, son);
     }
 //    cout<<"ConstDef"<<endl;    
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
@@ -109,6 +114,46 @@ antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
 
 antlrcpp::Any Visitor::visitConstInitVal(SysYParser::ConstInitValContext *ctx) {
 //    cout<<"ConstInitVal"<<endl;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        Var::data *var = son;
+        if (decl_type == Int) {
+            int dimension = 0, pos = 0;
+            for (auto to : ctx->children) {
+                if (to->getText() == ",") continue;
+                
+                if (to->getText() == "{") {
+                    dimension++;
+                } else if (to->getText() == "}") {
+                    pos = (pos + var->get_size(dimension) - 1) / var->get_size(dimension) * var->get_size(dimension);
+                    dimension--;                    
+                } else {
+                    to->accept(this);
+                    ir->add_to_int(son);
+                    var->change(pos, son);
+                }
+            }
+        } else {
+            int dimension = 0, pos = 0;
+            for (auto to : ctx->children) {
+                if (to->getText() == ",") continue;
+                
+                if (to->getText() == "{") {
+                    dimension++;
+                } else if (to->getText() == "}") {
+                    pos = (pos + var->get_size(dimension) - 1) / var->get_size(dimension) * var->get_size(dimension);
+                    dimension--;                    
+                } else {
+                    to->accept(this);
+                    ir->add_to_float(son);
+                    var->change(pos, son);
+                }
+            }            
+        }
+        delete son;
+        son = var;
+    }
     // string nxt = ctx->getText();
     // if (nxt[0] == '{') {
     //     pre_pos = ((pre_pos + pre_len -1) / pre_len) * pre_len;
@@ -136,13 +181,12 @@ antlrcpp::Any Visitor::visitVarDecl(SysYParser::VarDeclContext *ctx) {
     // visitChildren(ctx);
     // if (ir.is_global) ir.is_const = tem;
 
-    if (ctx->children[0]->getText() == "Int") {
-        
-//        symbol_table.add_var_int(son);
-    } else {
-//        symbol_table.add_bar_int(son);
-    }
-    
+//     if (ctx->children[0]->getText() == "Int") {        
+// //        symbol_table.add_var_int(son);
+//     } else {
+// //        symbol_table.add_bar_int(son);
+//     }
+    visitChildren(ctx);
     return nullptr;
 }
 
@@ -158,27 +202,32 @@ antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
             ir->add_def(name, son);
         } else {
             son = new Var::var_float();
-            visitChildren(ctx);           
+            visitChildren(ctx);            
             ir->add_to_float(son);
             ir->add_def(name, son);
         }
-        symbol.table.add_var(name, son);
+        symbol_table.add_var(name, son);
     } else {
-        Var::data var;
+        Var::data *var;
         if (decl_type == Int) {
             var = new Var::var_int_array();
-            for (int k = 2; k <= ctx->children.size(); k += 3) {
+            for (int k = 2; k < ctx->children.size(); k += 3) {                
                 ctx->children[k]->accept(this);
-                var->add_size(son);
+                var->add_size(dynamic_cast<Var::var_int*>(son)->value);
             }
+            var->alloca();           
         } else {
             var = new Var::var_float_array();
-            for (int k = 2; k <= ctx->children.size(); k += 3) {
+            for (int k = 2; k < ctx->children.size(); k += 3) {
                 ctx->children[k]->accept(this);
-                var->add_size(son);
+                var->add_size(dynamic_cast<Var::var_float*>(son)->value);
             }
+            var->alloca();
         }
-        symbol.table.add_var_array(name, son);
+        delete son;
+        son = var;
+        ctx->children.back()->accept(this);
+        symbol_table.add_var_array(name, son);
     }
     // pre = IR::data(++ir.cnt, ir.pre_type, ir.is_global);
     // pre.name = ctx->children[0]->getText();
@@ -216,6 +265,46 @@ antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
 
 antlrcpp::Any Visitor::visitInitVal(SysYParser::InitValContext *ctx) {    
 //    cout<<"InitVal"<<endl;
+    if (ctx->children.size() == 1) {
+        visitChildren(ctx);
+    } else {
+        Var::data *var = son;
+        if (decl_type == Int) {
+            int dimension = 0, pos = 0;
+            for (auto to : ctx->children) {
+                if (to->getText() == ",") continue;
+                
+                if (to->getText() == "{") {
+                    dimension++;
+                } else if (to->getText() == "}") {
+                    pos = (pos + var->get_size(dimension) - 1) / var->get_size(dimension) * var->get_size(dimension);
+                    dimension--;                    
+                } else {
+                    to->accept(this);
+                    ir->add_to_int(son);
+                    var->change(pos, son);
+                }
+            }
+        } else {
+            int dimension = 0, pos = 0;
+            for (auto to : ctx->children) {
+                if (to->getText() == ",") continue;
+                
+                if (to->getText() == "{") {
+                    dimension++;
+                } else if (to->getText() == "}") {
+                    pos = (pos + var->get_size(dimension) - 1) / var->get_size(dimension) * var->get_size(dimension);
+                    dimension--;                    
+                } else {
+                    to->accept(this);
+                    ir->add_to_float(son);
+                    var->change(pos, son);
+                }
+            }            
+        }
+        delete son;
+        son = var;
+    }
     // string nxt = ctx->getText();
     // if (nxt[0] == '{') {
     //     pre_pos = ((pre_pos + pre_len -1) / pre_len) * pre_len;
@@ -417,22 +506,23 @@ antlrcpp::Any Visitor::visitCond(SysYParser::CondContext *ctx) {
 
 antlrcpp::Any Visitor::visitLVal(SysYParser::LValContext *ctx) {
 //    cout<<"LVal"<<endl;
-    
-    Var::data *var;
     std::string name = ctx->children[0]->getText();
-    var->add_name(name);
     if (ctx->children.size() == 1) {
-        var = symbol_table.get_var(name);        
-        *son = *var;
+        delete son;
+        son = symbol_table.get_var(name)->copy();        
     } else {
-        var = symbol_table.get_var_array(name);
-        for (int k = 2; k <= ctx->children.size(); k++) {
-            ctx->children[k]->accept(this);            
-            var->add_size(son);
-        }
-        *son = *var;
-    }//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    visitChildren(ctx);
+        Var::data *var_array = symbol_table.get_var_array(name)->copy();
+        Var::data *var_sum = new Var::var_int();
+        int dimension = 1;
+        for (int k = 2; k <= ctx->children.size(); k += 3) {
+            ctx->children[k]->accept(this);
+            Var::data *var = son;
+            ir->add_binary_exp(IR::Mul, var, var, new Var::var_int(var_array->get_size(dimension)));
+            ir->add_binary_exp(IR::Add, var_sum, var_sum, var);
+            dimension++;
+        }        
+        ir->add_gep(son, var_array, var_sum);
+    }
     
     // string name = ctx->children[0]->getText();
     // ir.add_Int(0);
@@ -566,10 +656,10 @@ antlrcpp::Any Visitor::visitMulExp(SysYParser::MulExpContext *ctx) {
         visitChildren(ctx);
     } else {
         ctx->children[0]->accept(this);        
-        IR::data *left = son->copy();
+        Var::data *left = son->copy();
         
         ctx->children[2]->accept(this);
-        IR::data *right = son->copy();
+        Var::data *right = son->copy();
 
         int type;
         if (ctx->children[1]->getText() == "*") type = IR::Mul;
@@ -577,8 +667,6 @@ antlrcpp::Any Visitor::visitMulExp(SysYParser::MulExpContext *ctx) {
         else type = IR::Srew;
         
         ir->add_binary_exp(type, son, left, right);
-        delete left;
-        delete right;
     }
 
     return nullptr;
@@ -590,10 +678,10 @@ antlrcpp::Any Visitor::visitAddExp(SysYParser::AddExpContext *ctx) {
         visitChildren(ctx);
     } else {
         ctx->children[0]->accept(this);
-        IR::data left = son->copy();
+        Var::data *left = son->copy();
         
         ctx->children[2]->accept(this);
-        IR::data right = son->copy();
+        Var::data *right = son->copy();
         
         int type;
         if (ctx->children[1]->getText() == "+") type = IR::Add;

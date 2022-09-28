@@ -290,22 +290,31 @@ void IR::module::add_binary_exp(int type, Var::data *son, Var::data *left, Var::
             else if (type == Add) result = new Var::var_float(left_value + right_value);
             else if (type == Sub) result = new Var::var_float(left_value - right_value);
             result->is_const = true;
-            delete son;
-            son = result;
         }
     } else {
         if (left->type == Int) {
             result = new Var::var_int();
             result->add_id(++id_cnt);
             add_instruction(type, result, left, right);
-            delete son;
-            son = result;
         } else {
             result = new Var::var_int();
             result->add_id(++id_cnt);
             add_instruction(type, result, left, right);
         }
-    }    
+    }
+    delete son;
+    delete left;
+    delete right;
+    son = result;
+}
+void IR::module::add_gep(Var::data *son, Var::data *left, Var::data *right) {
+    Var::data *result;
+    if (left->type == Int) result = new Var::var_int();
+    else result = new Var::var_float();
+    result->add_id(++id_cnt);
+    add_instruction(Gep, result, left, right);
+    delete son;
+    son = result;
 }
 void IR::module::add_def(string name, Var::data *son) {
     global_var.push_back(son->copy());
