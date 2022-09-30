@@ -9,28 +9,20 @@ void Var::data::add_id(int id) {
 void Var::data::add_type(int type) {
     this->type = type;
 }
-Var::data* Var::var_int::copy() {
-    return new var_int(*this);
+shared_ptr<Var::data> Var::var_int::copy() {
+    return make_shared<Var::data>(*this);
 }
-Var::data* Var::var_float::copy() {
-    return new var_float(*this);
+shared_ptr<Var::data> Var::var_float::copy() {
+    return make_shared<Var::data>(*this);
 }
-Var::data* Var::var_bool::copy() {
-    return new var_bool(*this);
+shared_ptr<Var::data> Var::var_bool::copy() {
+    return make_shared<Var::data>(*this);
 }
-Var::data* Var::var_int_array::copy() {
-    return new var_int_array(*this);
+shared_ptr<Var::data> Var::var_int_array::copy() {
+    return make_shared<Var::data>(*this);
 }
-Var::data* Var::var_float_array::copy() {
-    return new var_float_array(*this);
-}
-Var::var_int_array::~var_int_array() {
-    for (auto k : value)
-        delete k;
-}
-Var::var_float_array::~var_float_array() {
-    for (auto k : value)
-        delete k;
+shared_ptr<Var::data> Var::var_float_array::copy() {
+    return make_shared<Var::data>(*this);
 }
 void Var::var_int_array::add_size(int array_size) {
     size.push_back(array_size);
@@ -53,48 +45,42 @@ int Var::var_float_array::get_size(int dimension) {
 }
 void Var::var_int_array::alloca() {
     for (int k = 1; k <= get_size(0); k++)
-        value.push_back(new var_int());
+        value.push_back(make_shared<data>(var_int()));
 }
 void Var::var_float_array::alloca() {
     for (int k = 1; k <= get_size(0); k++)
-        value.push_back(new var_float());
+        value.push_back(make_shared<data>(var_float()));
 }
-void Var::var_int_array::change(int pos, data *son) {
-    delete value[pos];
+void Var::var_int_array::change(int pos, shared_ptr<data> son) {
     value[pos] = son->copy();    
 }
-void Var::var_float_array::change(int pos, data *son) {
-    delete value[pos];
+void Var::var_float_array::change(int pos, shared_ptr<data> son) {
     value[pos] = son->copy();
 }
 void Var::symbol_table::in_stack() {
-    var.push_back(map<string, data*>());
-    var_array.push_back(map<string, data*>());
+    var.push_back(map<string, shared_ptr<data>>());
+    var_array.push_back(map<string, shared_ptr<data>>());
 }
-void Var::symbol_table::out_stack() {
-    for (auto k : var.back())
-        delete k.second;
-    for (auto k : var_array.back())
-        delete k.second;
+void Var::symbol_table::out_stack() {    
     var.pop_back();
 }
-Var::data* Var::symbol_table::get_var(string name) {
+shared_ptr<Var::data> Var::symbol_table::get_var(string name) {
     for (int k = var.size() - 1; k >= 0; k--) {
-        if (var[k].find(name) != var[k].end()) {
-            return new Var::data(*var[k][name]);
+        if (var[k].find(name) != var[k].end()) {            
+            return make_shared<data>(*var[k][name]);
         }
     }
 }
-Var::data* Var::symbol_table::get_var_array(string name) {
+shared_ptr<Var::data> Var::symbol_table::get_var_array(string name) {
     for (int k = var.size() - 1; k >= 0; k--) {
         if (var_array[k].find(name) != var_array[k].end()) {
-            return new Var::data(*var[k][name]);
+            return make_shared<data>(*var[k][name]);
         }
     }
 }
-void Var::symbol_table::add_var(string name, data *son) {
-    var.back()[name] = new Var::data(*son);
+void Var::symbol_table::add_var(string name, shared_ptr<data> son) {
+    var.back()[name] = make_shared<data>(*son);
 }
-void Var::symbol_table::add_var_array(string name, data *son) {
-    var.back()[name] = new Var::data(*son);
+void Var::symbol_table::add_var_array(string name, shared_ptr<data> son) {
+    var.back()[name] = make_shared<data>(*son);
 }

@@ -14,7 +14,6 @@ namespace Var {
         string name;
         bool is_const;
         data(){}
-        virtual ~data(){}
 
         void add_name(string name);
 
@@ -28,9 +27,9 @@ namespace Var {
 
         virtual void alloca() {}
 
-        virtual void change(int pos, data *son) {}
+        virtual void change(int pos, shared_ptr<data> son) {}
 
-        virtual data* copy() {}
+        virtual shared_ptr<data> copy() {}
     };
 
     class var_int : public data {
@@ -43,7 +42,7 @@ namespace Var {
             type = Int;
             is_const = true;
         }
-        data* copy();
+        shared_ptr<data> copy();
     };
 
     class var_float : public data {
@@ -56,7 +55,7 @@ namespace Var {
             type = Float;
             is_const = true;
         }
-        data* copy();
+        shared_ptr<data> copy();
     };
     
     class var_bool : public data {
@@ -65,20 +64,19 @@ namespace Var {
 
         bool value;
 
-        data* copy();
+        shared_ptr<data> copy();
     };
         
     class var_int_array : public data {
         
     public:
 
-        vector<data*> value;
+        vector<shared_ptr<data>> value;
         vector<int> size;
         
         var_int_array() {
             type = Int;
         }
-        ~var_int_array();
         
         void add_size(int dimension);
 
@@ -86,22 +84,21 @@ namespace Var {
 
         void alloca();
 
-        void change(int pos, data *son);
+        void change(int pos, shared_ptr<data> son);
         
-        data* copy();
+        shared_ptr<data> copy();
     };
 
     class var_float_array : public data {
         
     public:
 
-        vector<data*> value;
+        vector<shared_ptr<data>> value;
         vector<int> size;
 
         var_float_array() {
             type = Float;
         }
-        ~var_float_array();
         
         void add_size(int dimension);
 
@@ -109,9 +106,9 @@ namespace Var {
 
         void alloca();
 
-        void change(int pos, data *son);
+        void change(int pos, shared_ptr<data> son);
 
-        data* copy();
+        shared_ptr<data> copy();
     };
 
 
@@ -119,23 +116,22 @@ namespace Var {
         
     public:
         
-        vector<map<string, data*>> var, var_array;
+        vector<map<string, shared_ptr<data>>> var, var_array;
 
         symbol_table() {
             in_stack();
         }
-        ~symbol_table(); 
 
         void in_stack();
 
         void out_stack();
 
-        data* get_var(string name);
+        shared_ptr<data> get_var(string name);
 
-        data* get_var_array(string name);
+        shared_ptr<data> get_var_array(string name);
 
-        void add_var(string name, data* son);
+        void add_var(string name, shared_ptr<data> son);
 
-        void add_var_array(string name, data* son);
+        void add_var_array(string name, shared_ptr<data> son);
     };
 }

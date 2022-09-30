@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     string filename = argv[1];
-    cout<<filename<<endl;
+    cout << filename << endl;
  
     ifstream source(filename);
     
@@ -24,9 +24,9 @@ int main(int argc, char *argv[])
     SysYParser::CompUnitContext *root = parser.compUnit();
 
     
-    IR::module ir;
+    auto ir = make_shared<IR::module>();
 
-    Visitor visitor(&ir);
+    Visitor visitor(ir);
     
 
     visitor.visitCompUnit(root); 

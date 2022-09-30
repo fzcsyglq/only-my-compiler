@@ -9,8 +9,8 @@ class Visitor : public SysYBaseVisitor {
 
     enum { Int, Float, Void};
     
-    IR::IR *ir;
-    Var::data *son;
+    shared_ptr<IR::IR> ir;
+    shared_ptr<Var::data> son;
     int decl_type;
     Var::symbol_table symbol_table;
     
@@ -19,13 +19,10 @@ class Visitor : public SysYBaseVisitor {
     
 public:
     
-    Visitor(IR::IR *ir) : ir(ir) {
-        son = new Var::data();
+    Visitor(shared_ptr<IR::IR> ir) : ir(ir) {
+        son = make_shared<Var::data>(Var::data());
     }
 
-    ~Visitor() {
-        delete son;
-    }
     
     virtual antlrcpp::Any visitCompUnit(SysYParser::CompUnitContext *ctx) override;
 

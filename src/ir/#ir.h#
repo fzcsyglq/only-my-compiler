@@ -31,13 +31,13 @@ namespace IR {
         virtual void exit_function(shared_ptr<IR> ir) {}
 
         virtual void add_function_type(int type) {}
-
+        
         virtual void add_function_name(string name) {}
         
         virtual shared_ptr<para_data> add_function_parameter() {return nullptr;}
-
+        
         virtual void enter_block(shared_ptr<IR> ir) {}
-
+        
         virtual void exit_block(shared_ptr<IR> ir) {}
 
         virtual void add_block_id(int id) {}
