@@ -1,0 +1,5 @@
+#include "out_ir.h"
+
+void out_ir(IR::IR ir) {
+    
+}

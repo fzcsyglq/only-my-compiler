@@ -3,6 +3,7 @@
 #include "SysYParser.h"
 #include "visitor.h"
 #include "../ir/ir.h"
+#include "../ir/out_ir.h"
 //#include "../backend/asm.h"
 
 using namespace antlr4;
@@ -12,7 +13,6 @@ int main(int argc, char *argv[])
 {
     string filename = argv[1];
     cout << filename << endl;
- 
     ifstream source(filename);
     
         
@@ -24,13 +24,14 @@ int main(int argc, char *argv[])
     SysYParser::CompUnitContext *root = parser.compUnit();
 
     
-    auto ir = make_shared<IR::module>();
+    shared_ptr<IR::IR> ir = make_shared<IR::module>();
 
     Visitor visitor(ir);
     
 
-    visitor.visitCompUnit(root); 
-
+    visitor.visitCompUnit(root);
+    
+    out_ir(ir);
     // ofstream out;
     // string out_filename = argv[3];
     // out.open(out_filename);

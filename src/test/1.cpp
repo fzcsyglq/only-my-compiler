@@ -1,14 +1,13 @@
-int work() {
-    return 3;
+int n = 100, m;
+float x = 0.5, y;
+int a[10] = {1,2,3,4,5}, b[10];
+float c[2], d[100] = {1.2,3.4};
+void work(int x, float y) {
+    return;
+}
+float to_float(int a[][12][12], int b[][1][2]){
+    return 3.0;
 }
 int main() {
-    //int a[1][2][3]={1,2,3,4};
-    int a[100] = {1,2,3,4};
-    float b[100] = {1,2,3};
-    int x = 0;
-    int y = 1;
-    int z = 2;
-    int u = a[x+y+z];
-    a[x+y+z] = 100;
-    return 0;
+    return x;
 }

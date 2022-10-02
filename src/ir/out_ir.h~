@@ -1,0 +1,3 @@
+#include "../common/utility.h"
+
+void out_ir(ir);

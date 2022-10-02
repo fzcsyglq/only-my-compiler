@@ -19,10 +19,7 @@ class Visitor : public SysYBaseVisitor {
     
 public:
     
-    Visitor(shared_ptr<IR::IR> ir) : ir(ir) {
-        son = make_shared<Var::data>(Var::data());
-    }
-
+    Visitor(shared_ptr<IR::IR> ir) : ir(ir) {}
     
     virtual antlrcpp::Any visitCompUnit(SysYParser::CompUnitContext *ctx) override;
 

@@ -13,7 +13,6 @@ namespace Var {
         int id, type;
         string name;
         bool is_const;
-        data(){}
 
         void add_name(string name);
 
@@ -23,26 +22,30 @@ namespace Var {
         
         virtual void add_size(int array_size) {}
 
-        virtual int get_size(int dimension) {}
+        virtual int get_size(int dimension) {return -1;}
 
         virtual void alloca() {}
 
         virtual void change(int pos, shared_ptr<data> son) {}
 
-        virtual shared_ptr<data> copy() {}
+        virtual shared_ptr<data> copy() {return nullptr;}
+
+        virtual void out_def_ir(std::ofstream &out) {}
     };
 
     class var_int : public data {
         
-    public:
-
+    public:        
         int value;
-        
+
         var_int(int value = 0) : value(value) {
             type = Int;
             is_const = true;
         }
+        
         shared_ptr<data> copy();
+
+        void out_def_ir(std::ofstream &out);
     };
 
     class var_float : public data {
@@ -51,11 +54,15 @@ namespace Var {
 
         float value;
         
-        var_float(float value = 0.0) : value(value){
+        var_float(float value = 0.0) : value(value) {
             type = Float;
             is_const = true;
         }
+        
         shared_ptr<data> copy();
+
+        void out_def_ir(std::ofstream &out);
+        
     };
     
     class var_bool : public data {
@@ -63,6 +70,8 @@ namespace Var {
     public:
 
         bool value;
+
+        var_bool() {}
 
         shared_ptr<data> copy();
     };
@@ -73,20 +82,30 @@ namespace Var {
 
         vector<shared_ptr<data>> value;
         vector<int> size;
-        
+
         var_int_array() {
             type = Int;
         }
+
+        // var_int_array(const var_int_array &r) : data(r) {
+        //     for (auto k : r.value)
+        //         value.push_back(k);
+        //     for (auto k : r.size)
+        //         size.push_back(k);
+        // }
+
         
         void add_size(int dimension);
 
-        int get_size(int pos);
+        int get_size(int dimension);
 
         void alloca();
 
         void change(int pos, shared_ptr<data> son);
         
         shared_ptr<data> copy();
+
+        void out_def_ir(std::ofstream &out);
     };
 
     class var_float_array : public data {
@@ -99,16 +118,24 @@ namespace Var {
         var_float_array() {
             type = Float;
         }
+        // var_float_array(const var_float_array &r) : data(r) {
+        //     for (auto k : r.value)
+        //         value.push_back(k);
+        //     for (auto k : r.size)
+        //         size.push_back(k);
+        // }
         
         void add_size(int dimension);
 
-        int get_size(int pos);
+        int get_size(int dimension);
 
         void alloca();
 
         void change(int pos, shared_ptr<data> son);
 
         shared_ptr<data> copy();
+
+        void out_def_ir(std::ofstream &out);
     };
 
 
