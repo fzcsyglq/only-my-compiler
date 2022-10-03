@@ -12,12 +12,6 @@ namespace IR {
     class function;
     class block;
     class instruction;
-    class para_data {
-    public:
-        int type;
-        string name;
-        vector<shared_ptr<Var::data>> exp;
-    };
 
     class IR {
         
@@ -33,7 +27,7 @@ namespace IR {
         
         virtual void add_function_name(string name) {}
         
-        virtual shared_ptr<para_data> add_function_parameter() {return nullptr;}
+        virtual shared_ptr<Var::data> add_function_parameter() {}
         
         virtual void enter_block(shared_ptr<IR> ir) {}
         
@@ -58,6 +52,8 @@ namespace IR {
         virtual void add_gep(shared_ptr<Var::data> son, shared_ptr<Var::data> left, shared_ptr<Var::data> right) {}
 
         virtual void add_alloca(shared_ptr<Var::data> son) {}
+
+        virtual void add_para(shared_ptr<Var::data> son) {}
     };
     
     
@@ -84,7 +80,7 @@ namespace IR {
 
         shared_ptr<Var::data> add_binary_exp(int type, shared_ptr<Var::data> left, shared_ptr<Var::data> right);
 
-        void add_gep(shared_ptr<Var::data> son, shared_ptr<Var::data> left, shared_ptr<Var::data> right);
+        void add_gep(shared_ptr<Var::data> son, shared_ptr<Var::data> left, shared_ptr<Var::data> right);        
     };
 
     class function : public module {
@@ -94,8 +90,7 @@ namespace IR {
         int return_type;        
         string function_name;        
 
-
-        vector<shared_ptr<para_data>> parameters;
+        vector<shared_ptr<Var::data>> parameters;
         
         vector<shared_ptr<block>> blocks;
         
@@ -107,11 +102,13 @@ namespace IR {
 
         void add_function_name(string name);
 
-        shared_ptr<para_data> add_function_parameter();
+        shared_ptr<Var::data> add_function_parameter();
 
         void exit_function(shared_ptr<IR> ir);
 
         void enter_block(shared_ptr<IR> ir);
+
+        void add_para(shared_ptr<Var::data> son);
     };
     
     class block : public  function {

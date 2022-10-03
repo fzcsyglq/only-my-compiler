@@ -217,24 +217,24 @@ antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
 
 antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
 //    cout<<"FuncFParams"<<endl;
-    std::queue<shared_ptr<Var::data>> q;
+    queue<shared_ptr<Var::data>> q;    
     for (int k = 0; k < ctx->children.size(); k += 2) {
-        shared_ptr<Var::data> var = ir->add_function_parameter();
+        q.push(ir->add_function_parameter());
     }
     for (int k = 0; k < ctx->children.size(); k += 2) {
-        
+        son = q.front();
+        q.pop();
+        ctx->children[k]->accept(this);
     }
     return nullptr;
 }
 
 antlrcpp::Any Visitor::visitFuncFParam(SysYParser::FuncFParamContext *ctx) {
 //    cout<<"FuncFParam"<<endl;
-    shared_ptr<Var::data> var = ir->add_function_parameter();
+    shared_ptr<Var::data> var = son;
     
-    // if (ctx->children[0]->getText() == "Int") para->type = Int;
-    // else para->type = Float;
-
-    // para->name = ctx->children[1]->getText();
+    if (ctx->children[0]->getText() == "Int") son->add_type(Int);
+    else son->add_type(Float);
 
     for (int k = 5; k < ctx->children.size(); k += 3) {
         ctx->children[k]->accept(this);

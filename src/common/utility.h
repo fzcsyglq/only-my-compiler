@@ -7,9 +7,11 @@
 #include <map>
 #include <fstream>
 #include <memory>
+#include <queue>
 
 using std::string;
 using std::vector;
+using std::queue;
 using std::map;
 using std::cout;
 using std::endl;

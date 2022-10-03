@@ -13,27 +13,20 @@ target triple = "x86_64-pc-linux-gnu"
 @d = dso_local global <{ float, float, [98 x float] }> <{ float 0x3FF3333340000000, float 0x400B333340000000, [98 x float] zeroinitializer }>, align 16
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local float @_Z4workifPA_A_iPA_f(i32 %0, float %1, i32* %2, float* %3) #0 {
+define dso_local i32 @_Z4workifPA10_iPA_i(i32 %0, float %1, i32* %2, i32* %3) #0 {
   %5 = alloca i32, align 4
   %6 = alloca float, align 4
-  %7 = alloca i32*, align 8
-  %8 = alloca float*, align 8
+  %7 = alloca [10 x i32]*, align 8
+  %8 = alloca i32*, align 8
   store i32 %0, i32* %5, align 4
   store float %1, float* %6, align 4
-  store i32* %2, i32** %7, align 8
-  store float* %3, float** %8, align 8
+  store [10 x i32]* %2, [10 x i32]** %7, align 8
+  store i32* %3, i32** %8, align 8
   %9 = load i32, i32* @n, align 4
-  %10 = zext i32 %9 to i64
-  %11 = load i32, i32* @n, align 4
-  %12 = load i32, i32* getelementptr inbounds ([10 x i32], [10 x i32]* @a, i64 0, i64 0), align 16
-  %13 = add nsw i32 %11, %12
-  %14 = zext i32 %13 to i64
-  %15 = load float*, float** %8, align 8
-  %16 = mul nsw i64 1, %14
-  %17 = getelementptr inbounds float, float* %15, i64 %16
-  %18 = getelementptr inbounds float, float* %17, i64 1
-  %19 = load float, float* %18, align 4
-  ret float %19
+  %10 = load i32, i32* getelementptr inbounds ([10 x i32], [10 x i32]* @a, i64 0, i64 0), align 16
+  %11 = add nsw i32 %9, %10
+  %12 = zext i32 %11 to i64
+  ret i32 999
 }
 
 ; Function Attrs: noinline norecurse nounwind optnone uwtable

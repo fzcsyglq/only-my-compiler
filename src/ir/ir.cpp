@@ -1,7 +1,7 @@
 #include "ir.h"
 
 void IR::module::enter_function(shared_ptr<IR> ir) {    
-    functions.push_back(make_shared<function>(function()));
+    functions.push_back(make_shared<function>());
     auto tem = ir;
     ir = functions.back();
     ir->fa = tem;
@@ -112,8 +112,9 @@ void IR::function::add_function_name(string name) {
     function_name = name;
 }
 
-shared_ptr<IR::para_data> IR::function::add_function_parameter() {    
-    parameters.push_back(make_shared<para_data>());
+shared_ptr<Var::data> IR::function::add_function_parameter() {    
+    parameters.push_back(make_shared<Var::data>());
+    parameters.back()->add_id(++id_cnt);
     return parameters.back();    
 }
 
@@ -122,6 +123,11 @@ void IR::function::enter_block(shared_ptr<IR> ir) {
     auto tem = ir;    
     ir = blocks.back();
     ir->fa = tem;    
+}
+
+void IR::function::add_para(shared_ptr<Var::data> son) {
+    son->add_id(++id_cnt);
+    parameters.back()->add_size(son);
 }
 
 void IR::block::exit_block(shared_ptr<IR> ir) {

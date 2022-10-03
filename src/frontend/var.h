@@ -20,9 +20,9 @@ namespace Var {
 
         void add_type(int type);
         
-        virtual void add_size(int array_size) {}
+        virtual void add_size(shared_ptr<Var::data> son) {}
 
-        virtual int get_size(int dimension) {return -1;}
+        virtual int get_size(int demension) {return -1;}
 
         virtual void alloca() {}
 
@@ -81,21 +81,13 @@ namespace Var {
     public:
 
         vector<shared_ptr<data>> value;
-        vector<int> size;
+        vector<shared_ptr<data>> size;
 
         var_int_array() {
             type = Int;
         }
 
-        // var_int_array(const var_int_array &r) : data(r) {
-        //     for (auto k : r.value)
-        //         value.push_back(k);
-        //     for (auto k : r.size)
-        //         size.push_back(k);
-        // }
-
-        
-        void add_size(int dimension);
+        void add_size(shared_ptr<Var::data> son);
 
         int get_size(int dimension);
 
@@ -113,19 +105,13 @@ namespace Var {
     public:
 
         vector<shared_ptr<data>> value;
-        vector<int> size;
+        vector<shared_ptr<data>> size;
 
         var_float_array() {
             type = Float;
         }
-        // var_float_array(const var_float_array &r) : data(r) {
-        //     for (auto k : r.value)
-        //         value.push_back(k);
-        //     for (auto k : r.size)
-        //         size.push_back(k);
-        // }
         
-        void add_size(int dimension);
+        void add_size(shared_ptr<Var::data> son);
 
         int get_size(int dimension);
 
