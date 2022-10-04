@@ -111,23 +111,20 @@ void IR::function::add_function_type(int type) {
 void IR::function::add_function_name(string name) {
     function_name = name;
 }
-
-shared_ptr<Var::data> IR::function::add_function_parameter() {    
-    parameters.push_back(make_shared<Var::data>());
-    parameters.back()->add_id(++id_cnt);
-    return parameters.back();    
+void IR::function::add_function_parameter(shared_ptr<Var::data> son) {
+    son->add_id(++id_cnt);
+    parameters.push_back(son);
 }
-
+void IR::function::deal_parameter() {
+    for (auto k : parameters) {
+        add_alloca(k);
+    }
+}
 void IR::function::enter_block(shared_ptr<IR> ir) {
     blocks.push_back(make_shared<block>(block(++id_cnt)));
     auto tem = ir;    
     ir = blocks.back();
     ir->fa = tem;    
-}
-
-void IR::function::add_para(shared_ptr<Var::data> son) {
-    son->add_id(++id_cnt);
-    parameters.back()->add_size(son);
 }
 
 void IR::block::exit_block(shared_ptr<IR> ir) {
@@ -145,8 +142,12 @@ void IR::block::add_instruction(int type, shared_ptr<Var::data> result, shared_p
 }
 void IR::block::add_alloca(shared_ptr<Var::data> son) {
     son->add_id(++id_cnt);
-    add_instruction(Alloca, son);
+    add_instruction(Alloca, son->copy());
+}
+void IR::block::add_store(shared_ptr<Var::data> left, shared_ptr<Var::data> right) {
+    add_instruction(Store, left, right);
 }
 void IR::block::add_def(shared_ptr<Var::data> son) {
-    add_instruction(Store, son);
+    if (son->is_const)
+        add_instruction(Store, son->copy(), son->copy());
 }

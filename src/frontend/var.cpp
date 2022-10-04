@@ -24,23 +24,23 @@ shared_ptr<Var::data> Var::var_int_array::copy() {
 shared_ptr<Var::data> Var::var_float_array::copy() {
     return make_shared<Var::var_float_array>(*this);
 }
-void Var::var_int_array::add_size(shared_ptr<Var::data> son) {
-    size.push_back(son);
+void Var::var_int_array::add_size(int length) {    
+    size.push_back(length);
 }
 
-void Var::var_float_array::add_size(shared_ptr<Var::data> son) {
-    size.push_back(son);    
+void Var::var_float_array::add_size(int length) {
+    size.push_back(length);    
 }
 int Var::var_int_array::get_size(int dimension) {
     int ans = 1;
     for (int k = dimension; k < size.size(); k++)
-        ans *= dynamic_pointer_cast<var_int>(size[k])->value;
+        ans *= size[k];
     return ans;
 }
 int Var::var_float_array::get_size(int dimension) {
     int ans = 1;
     for (int k = dimension; k < size.size(); k++)
-        ans *= dynamic_pointer_cast<var_int>(size[k])->value;
+        ans *= size[k];
     return ans;
 }
 void Var::var_int_array::alloca() {

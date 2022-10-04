@@ -11,7 +11,7 @@ class Visitor : public SysYBaseVisitor {
     
     shared_ptr<IR::IR> ir;
     shared_ptr<Var::data> son;
-    int decl_type;
+    int btype;
     Var::symbol_table symbol_table;
     
     bool is_const, is_global;

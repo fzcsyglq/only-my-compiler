@@ -25,9 +25,9 @@ antlrcpp::Any Visitor::visitConstDecl(SysYParser::ConstDeclContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitBType(SysYParser::BTypeContext *ctx) {
-    cout<<"BType"<<endl;
-    if (ctx->getText() == "int") decl_type = Int;
-    else decl_type = Float;
+    cout<<"BType"<<endl;    
+    if (ctx->getText() == "int") btype = Int;
+    else btype = Float;
     // visitChildren(ctx);
     return nullptr;
 }
@@ -36,10 +36,10 @@ antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
     string name = ctx->children[0]->getText();
     cout << name << endl;
     if (ctx->children.size() == 1 || ctx->children[1]->getText() != "[") {
-        if (decl_type == Int) son = make_shared<Var::var_int>();
+        if (btype == Int) son = make_shared<Var::var_int>();
         else son = make_shared<Var::var_float>();
         visitChildren(ctx);
-        if (decl_type == Int) ir->add_to_int(son);            
+        if (btype == Int) ir->add_to_int(son);
         else ir->add_to_float(son);
         son->add_name(name);
         ir->add_alloca(son);        
@@ -47,19 +47,12 @@ antlrcpp::Any Visitor::visitConstDef(SysYParser::ConstDefContext *ctx) {
         symbol_table.add_var(name, son);
     } else {
         shared_ptr<Var::data> var;
-        if (decl_type == Int) {
-            var = make_shared<Var::var_int_array>();
-            for (int k = 2; k < ctx->children.size() - 1; k += 3) {
-                ctx->children[k]->accept(this);
-                var->add_size(son);
-            }
-        } else {
-            var = make_shared<Var::var_float_array>();
-            for (int k = 2; k < ctx->children.size() - 1; k += 3) {
-                ctx->children[k]->accept(this);
-                var->add_size(son);
-            }
-        }
+        if (btype == Int) var = make_shared<Var::var_int_array>();
+        else var = make_shared<Var::var_float_array>();
+        for (int k = 2; k < ctx->children.size() - 1; k += 3) {
+            ctx->children[k]->accept(this);
+            var->add_size(dynamic_pointer_cast<Var::var_int>(son)->value);
+        }        
         var->alloca();
         son = var;
         ir->add_alloca(son);
@@ -88,7 +81,7 @@ antlrcpp::Any Visitor::visitConstInitVal(SysYParser::ConstInitValContext *ctx) {
                 dimension--;
             } else {
                 to->accept(this);
-                if (decl_type == Int) ir->add_to_int(son);
+                if (btype == Int) ir->add_to_int(son);
                 else ir->add_to_float(son);
 //                ir->add_gep(son, var, make_shared<Var::var_int>(pos));
 //                ir->add_def(son);
@@ -111,10 +104,10 @@ antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
     string name = ctx->children[0]->getText();
     cout << name << endl;
     if (ctx->children.size() == 1 || ctx->children[1]->getText() != "[") {
-        if (decl_type == Int) son = make_shared<Var::var_int>();
+        if (btype == Int) son = make_shared<Var::var_int>();
         else son = make_shared<Var::var_float>();
         visitChildren(ctx);
-        if (decl_type == Int) ir->add_to_int(son);            
+        if (btype == Int) ir->add_to_int(son);            
         else ir->add_to_float(son);
         son->add_name(name);
         ir->add_alloca(son);        
@@ -122,19 +115,13 @@ antlrcpp::Any Visitor::visitVarDef(SysYParser::VarDefContext *ctx) {
         symbol_table.add_var(name, son);
     } else {
         shared_ptr<Var::data> var;
-        if (decl_type == Int) {
-            var = make_shared<Var::var_int_array>();
-            for (int k = 2; k < ctx->children.size() - 1; k += 3) {
-                ctx->children[k]->accept(this);
-                var->add_size(son);
-            }
-        } else {
-            var = make_shared<Var::var_float_array>();
-            for (int k = 2; k < ctx->children.size() - 1; k += 3) {
-                ctx->children[k]->accept(this);
-                var->add_size(son);
-            }
+        if (btype == Int) var = make_shared<Var::var_int_array>();
+        else var = make_shared<Var::var_float_array>();
+        for (int k = 2; k < ctx->children.size() - 1; k += 3) {
+            ctx->children[k]->accept(this);
+            var->add_size(dynamic_pointer_cast<Var::var_int>(son)->value);
         }
+        
         var->alloca();
         son = var;
         ir->add_alloca(son);
@@ -163,7 +150,7 @@ antlrcpp::Any Visitor::visitInitVal(SysYParser::InitValContext *ctx) {
                 dimension--;
             } else {
                 to->accept(this);
-                if (decl_type == Int) ir->add_to_int(son);
+                if (btype == Int) ir->add_to_int(son);
                 else ir->add_to_float(son);
 //                ir->add_gep(son, var, make_shared<Var::var_int>(pos));
 //                ir->add_def(son);
@@ -217,30 +204,32 @@ antlrcpp::Any Visitor::visitFuncType(SysYParser::FuncTypeContext *ctx) {
 
 antlrcpp::Any Visitor::visitFuncFParams(SysYParser::FuncFParamsContext *ctx) {
 //    cout<<"FuncFParams"<<endl;
-    std::queue<shared_ptr<Var::data>> q;
-    for (int k = 0; k < ctx->children.size(); k += 2) {
-        shared_ptr<Var::data> var = ir->add_function_parameter();
-    }
-    for (int k = 0; k < ctx->children.size(); k += 2) {
-        
-    }
+    visitChildren(ctx);    
+    ir->deal_parameter();
     return nullptr;
 }
 
 antlrcpp::Any Visitor::visitFuncFParam(SysYParser::FuncFParamContext *ctx) {
 //    cout<<"FuncFParam"<<endl;
-    shared_ptr<Var::data> var = ir->add_function_parameter();
-    
-    // if (ctx->children[0]->getText() == "Int") para->type = Int;
-    // else para->type = Float;
-
-    // para->name = ctx->children[1]->getText();
-
-    for (int k = 5; k < ctx->children.size(); k += 3) {
-        ctx->children[k]->accept(this);
-        ir->add_para(son);
+    shared_ptr<Var::data> var;
+    int type;
+    string name = ctx->children[1]->getText();
+    var->add_name(name);
+    if (ctx->children[0]->getText() == "int") type = Int;
+    else type = Float;
+    if (ctx->children.size() == 2) {
+        if (type == Int) var = make_shared<Var::var_int>();
+        else var = make_shared<Var::var_float>(); 
+    } else {
+        if (type == Int) var = make_shared<Var::var_int_array>();
+        else var = make_shared<Var::var_float_array>();        
+        for (int k = 5; k < ctx->children.size(); k += 3) {
+            ctx->children[k]->accept(this);
+            var->add_size(dynamic_pointer_cast<Var::var_int>(son)->value);
+        }
     }
-    cout<<ctx->children.size()<<endl;
+    ir->add_function_parameter(var);
+//    cout<<ctx->children.size()<<endl;
     return nullptr;
 }
 

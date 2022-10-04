@@ -27,7 +27,7 @@ namespace IR {
         
         virtual void add_function_name(string name) {}
         
-        virtual shared_ptr<Var::data> add_function_parameter() {}
+        virtual void add_function_parameter(shared_ptr<Var::data> son) {}
         
         virtual void enter_block(shared_ptr<IR> ir) {}
         
@@ -53,7 +53,10 @@ namespace IR {
 
         virtual void add_alloca(shared_ptr<Var::data> son) {}
 
-        virtual void add_para(shared_ptr<Var::data> son) {}
+        virtual void deal_parameter();
+
+        virtual void add_store(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
+
     };
     
     
@@ -102,13 +105,13 @@ namespace IR {
 
         void add_function_name(string name);
 
-        shared_ptr<Var::data> add_function_parameter();
+        void add_function_parameter(shared_ptr<Var::data>);
+
+        void deal_parameter();
 
         void exit_function(shared_ptr<IR> ir);
 
         void enter_block(shared_ptr<IR> ir);
-
-        void add_para(shared_ptr<Var::data> son);
     };
     
     class block : public  function {
@@ -126,6 +129,8 @@ namespace IR {
         void exit_block(shared_ptr<IR> ir);
 
         void add_alloca(shared_ptr<Var::data> son);
+
+        void add_store(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
 
         void add_def(shared_ptr<Var::data> son);
 

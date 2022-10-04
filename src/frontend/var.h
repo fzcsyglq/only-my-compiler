@@ -20,7 +20,7 @@ namespace Var {
 
         void add_type(int type);
         
-        virtual void add_size(shared_ptr<Var::data> son) {}
+        virtual void add_size(int length) {}
 
         virtual int get_size(int demension) {return -1;}
 
@@ -81,13 +81,13 @@ namespace Var {
     public:
 
         vector<shared_ptr<data>> value;
-        vector<shared_ptr<data>> size;
+        vector<int> size;
 
         var_int_array() {
             type = Int;
         }
 
-        void add_size(shared_ptr<Var::data> son);
+        void add_size(int length);
 
         int get_size(int dimension);
 
@@ -105,13 +105,13 @@ namespace Var {
     public:
 
         vector<shared_ptr<data>> value;
-        vector<shared_ptr<data>> size;
+        vector<int> size;
 
         var_float_array() {
             type = Float;
         }
         
-        void add_size(shared_ptr<Var::data> son);
+        void add_size(int length);
 
         int get_size(int dimension);
 
