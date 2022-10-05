@@ -39,7 +39,7 @@ namespace IR {
 
         virtual void add_to_float(shared_ptr<Var::data> son) {}
 
-        virtual void add_def(shared_ptr<Var::data> son) {}
+        virtual void add_assignment(shared_ptr<Var::data> left, shared_ptr<Var::data> right) {}
 
         virtual void add_instruction(int type, shared_ptr<Var::data> result, shared_ptr<Var::data> left = nullptr, shared_ptr<Var::data> right = nullptr) {}
 
@@ -49,7 +49,7 @@ namespace IR {
 
         virtual shared_ptr<Var::data> add_binary_exp(int type, shared_ptr<Var::data> left, shared_ptr<Var::data> right) {}
 
-        virtual void add_gep(shared_ptr<Var::data> son, shared_ptr<Var::data> left, shared_ptr<Var::data> right) {}
+        virtual shared_ptr<Var::data> add_gep(shared_ptr<Var::data> left, shared_ptr<Var::data> right) {}
 
         virtual void add_alloca(shared_ptr<Var::data> son) {}
 
@@ -77,13 +77,13 @@ namespace IR {
 
         void add_unary_minus(shared_ptr<Var::data> son);
 
-        void add_mul_exp();
+        void add_mul_exp();        
         
-        void add_def(shared_ptr<Var::data> son);
-
         shared_ptr<Var::data> add_binary_exp(int type, shared_ptr<Var::data> left, shared_ptr<Var::data> right);
 
-        void add_gep(shared_ptr<Var::data> son, shared_ptr<Var::data> left, shared_ptr<Var::data> right);        
+        shared_ptr<Var::data> add_gep(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
+
+        void add_assignment(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
     };
 
     class function : public module {
@@ -132,11 +132,9 @@ namespace IR {
 
         void add_store(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
 
-        void add_def(shared_ptr<Var::data> son);
-
         void add_instruction(int type, shared_ptr<Var::data> result, shared_ptr<Var::data> left, shared_ptr<Var::data> right);
 
-        
+        void add_assignment(shared_ptr<Var::data> left, shared_ptr<Var::data> right);
     };
 
     class instruction : public block {

@@ -98,7 +98,7 @@ shared_ptr<Var::data> IR::module::add_gep(shared_ptr<Var::data> left, shared_ptr
     return result;
 }
 void IR::module::add_assignment(shared_ptr<Var::data> left, shared_ptr<Var::data> right) {
-    
+    left->
 }
 void IR::function::exit_function(shared_ptr<IR> ir) {
     ir = fa;

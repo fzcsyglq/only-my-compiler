@@ -52,7 +52,7 @@ void Var::var_float_array::alloca() {
         value.push_back(make_shared<var_float>());
 }
 void Var::var_int_array::change(int pos, shared_ptr<data> son) {
-    value[pos] = son->copy();    
+    value[pos] = son->copy();
 }
 void Var::var_float_array::change(int pos, shared_ptr<data> son) {
     value[pos] = son->copy();

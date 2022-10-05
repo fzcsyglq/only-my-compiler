@@ -31,6 +31,8 @@ namespace Var {
         virtual shared_ptr<data> copy() {return nullptr;}
 
         virtual void out_def_ir(std::ofstream &out) {}
+
+        virtual bool is_array() {}
     };
 
     class var_int : public data {
@@ -46,6 +48,8 @@ namespace Var {
         shared_ptr<data> copy();
 
         void out_def_ir(std::ofstream &out);
+
+        bool is_array() {return false;}
     };
 
     class var_float : public data {
@@ -62,7 +66,8 @@ namespace Var {
         shared_ptr<data> copy();
 
         void out_def_ir(std::ofstream &out);
-        
+
+        bool is_array() {return false;}
     };
     
     class var_bool : public data {
@@ -98,6 +103,8 @@ namespace Var {
         shared_ptr<data> copy();
 
         void out_def_ir(std::ofstream &out);
+
+        bool is_array() {return true;}
     };
 
     class var_float_array : public data {
@@ -122,6 +129,8 @@ namespace Var {
         shared_ptr<data> copy();
 
         void out_def_ir(std::ofstream &out);
+
+        bool is_array() {return true;}
     };
 
 
